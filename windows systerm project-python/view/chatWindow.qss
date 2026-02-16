@@ -1,0 +1,81 @@
+/* בסיס כללי */
+QWidget {
+    background-color: #f7f8fc;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    font-size: 14px;
+    color: #2b2b2b;
+}
+
+/* תצוגת השיחה (תיבת טקסט ראשית) */
+QTextEdit {
+    background-color: #ffffff;
+    border: 1px solid #d6d8db;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #2f2f2f;
+    line-height: 1.5;
+}
+
+/* שורת הקלט */
+QLineEdit {
+    background-color: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #495057;
+}
+
+QLineEdit:focus {
+    border-color: #3d5129;
+}
+
+/* כפתור שליחה */
+QPushButton {
+    background-color: #485c2f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+QPushButton:hover {
+    background-color: #3d5129;
+}
+
+QPushButton:pressed {
+    background-color: #344624;
+}
+
+QPushButton:disabled {
+    background-color: #9dab8c;
+    color: white;
+    opacity: 0.6;
+}
+
+/* גלגלת אנכית */
+QScrollBar:vertical {
+    border: none;
+    background: #f0f0f0;
+    width: 12px;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: #c0c0c0;
+    min-height: 20px;
+    border-radius: 6px;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    background: none;
+    height: 0px;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}

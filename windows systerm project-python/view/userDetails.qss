@@ -1,0 +1,165 @@
+/* ✅ QMainWindow */
+QMainWindow {
+    background-color: #f7f8fc;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    color: #212529;
+}
+
+/* ✅ כותרת ראשית */
+QLabel#mainLabel {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2b2b2b;
+    padding-bottom: 15px;
+    qproperty-alignment: AlignCenter;
+}
+
+/* ✅ תוויות לשדות */
+QLabel#fieldLabel {
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;
+    padding-right: 5px;
+}
+
+/* ✅ ערך יתרה */
+QLabel#balanceValueLabel {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f7a3a;
+    background-color: #f1f3f5;
+    border: 1px solid #d0d4da;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+/* ✅ QLineEdit */
+QLineEdit {
+    background-color: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 14px;
+    color: #495057;
+}
+
+/* במצב פוקוס */
+QLineEdit:focus {
+    border: 1px solid #0078d7;
+}
+
+/* במצב עריכה */
+QLineEdit[readOnly="false"] {
+    background-color: #eef1f4;
+    border-color: #adb5bd;
+    color: #212529;
+}
+QLineEdit[readOnly="false"]:focus {
+     background-color: #ffffff;
+     border-color: #0078d7;
+}
+
+/* ✅ כפתורים */
+QPushButton {
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 8px 18px;
+    border: none;
+}
+
+/* כפתור שמירה */
+QPushButton#saveButton {
+    background-color: #485c2f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+}
+
+QPushButton#saveButton:hover {
+    background-color: #3d5129;
+}
+
+QPushButton#saveButton:pressed {
+    background-color: #344624;
+}
+
+QPushButton#saveButton:disabled {
+    background-color: #9dab8c;
+    color: white;
+    opacity: 0.6;
+}
+
+QPushButton#saveButton:disabled {
+    background-color: #adb5bd;
+    color: white;
+    opacity: 0.6;
+}
+
+/* כפתור עריכה (edit/lock) */
+QPushButton#editToggleButton {
+    background-color: #e9ecef;
+    color: #495057;
+    border: 1px solid #ced4da;
+    padding: 8px 14px;
+}
+QPushButton#editToggleButton:hover {
+    background-color: #dee2e6;
+    color: #343a40;
+}
+QPushButton#editToggleButton:pressed {
+    background-color: #d6dbdf;
+    color: #343a40;
+}
+
+/* במצב "Lock" – יותר בולט */
+QPushButton#editToggleButton[text="Lock"] {
+    background-color: #485c2f;
+    border: 1px solid #3e5228;
+    color:rgb(255, 255, 255);
+}
+QPushButton#editToggleButton[text="Lock"]:hover {
+    background-color: #3e5228; /* צבע רקע כהה יותר בעת ריחוף */
+    color: white; /* טקסט לבן */
+}
+
+QPushButton#editToggleButton[text="Lock"]:pressed {
+    background-color: #344623; /* צבע רקע כהה יותר בעת לחיצה */
+    color: white; /* טקסט לבן */
+}
+
+/* ✅ קו הפרדה */
+QFrame#separatorFrame {
+    border: none;
+    border-top: 1px solid #dee2e6;
+    margin: 15px 0;
+}
+
+/* ✅ QMessageBox */
+QMessageBox {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+QMessageBox QLabel {
+    color: #333;
+    font-size: 14px;
+    padding: 10px;
+}
+QMessageBox QPushButton {
+    background-color: #485c2f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    margin: 5px;
+}
+
+QMessageBox QPushButton:hover {
+    background-color: #3d5129;
+}
+
+QMessageBox QPushButton:pressed {
+    background-color: #344624;
+}

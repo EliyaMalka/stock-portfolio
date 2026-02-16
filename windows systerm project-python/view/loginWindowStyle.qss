@@ -1,0 +1,113 @@
+/* ========== רקע כללי של כל החלון ========== */
+QWidget {
+    background-color: #f8f9fa;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* ========== עיצוב טאב מודרני על כל השורה ========== */
+QTabWidget::pane {
+    border: none;
+    padding-top: 10px;
+    margin-left: -250px;
+}
+
+QTabBar {
+    qproperty-drawBase: 0;
+    alignment: center;
+}
+
+QTabBar::tab {
+    background: transparent;
+    color: #4a5568;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px;
+    border: none;
+    min-width: 150px;
+    max-width: 150px;
+    text-align: center;
+    transition: all 0.2s ease; /* חלקות על שינויי גודל */
+}
+
+	
+QTabBar::tab:selected {
+    color: #485c2f;
+    color: #485c2f;
+    border-bottom: 3px solid #485c2f;
+    font-size: 18px;
+    background-color: transparent;
+}
+
+QTabBar::tab:hover {
+    color: #5a7240;
+    color: #5a7240;
+    border-bottom: 3px solid #5a7240;
+    font-size: 17px;
+}
+
+QTabWidget, QTabBar, QTabBar::tab, QWidget {
+    background: transparent;
+}
+
+/* ========== שדות קלט כללים (לוגין וסיינאפ) ========== */
+QLineEdit {
+    max-width: 300px;
+    min-width: 300px;
+}
+
+QLineEdit#userName,
+QLineEdit#password,
+QLineEdit#signupUsername,
+QLineEdit#signupEmail,
+QLineEdit#signupPassword,
+QLineEdit#signupConfirmPassword {
+    background-color: #ffffff;
+    border: 1px solid #e0e4e7;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #4a5568;
+}
+
+QLineEdit#userName:focus,
+QLineEdit#password:focus,
+QLineEdit#signupUsername:focus,
+QLineEdit#signupEmail:focus,
+QLineEdit#signupPassword:focus,
+QLineEdit#signupConfirmPassword:focus {
+    border-color: #485c2f;
+    box-shadow: 0 0 0 2px rgba(72, 92, 47, 0.2);
+}
+
+/* ========== שדה שגיאות ========== */
+QLineEdit#wrongDetails {
+    background-color: #ffffff;
+    border: 1px solid #e0e4e7;
+    border-radius: 8px;
+    padding: 5px;
+    font-size: 14px;
+    color: #d9534f;
+    text-align: center;
+}
+
+/* ========== כפתורים (התחברות ורישום) ========== */
+QPushButton#login,
+QPushButton#signup {
+    background-color: #485c2f;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+QPushButton#login:hover,
+QPushButton#signup:hover {
+    background-color: #5a7240;
+}
+
+QPushButton#login:pressed,
+QPushButton#signup:pressed {
+    background-color: #374725;
+}

@@ -1,0 +1,98 @@
+/* 🔹 בסיס כללי */
+QWidget {
+    background-color: #f7f8fc;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    font-size: 14px;
+    color: #2b2b2b;
+}
+
+/* 🔹 ComboBox */
+QComboBox {
+    background-color: #ffffff;
+    border: 1px solid #d0d4da;
+    border-radius: 6px;
+    padding: 6px 12px;
+    min-width: 120px;
+    font-weight: 500;
+    margin: 0px;
+}
+
+QComboBox:hover {
+    border: 1px solid #b0b0b0;
+}
+
+QComboBox::drop-down {
+    border: none;
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 18px;
+    margin-right: 6px;
+}
+
+QComboBox::down-arrow {
+    image: url(:/icons/arrow-down.png);
+    width: 12px;
+    height: 12px;
+}
+
+/* 🔹 QLabel */
+QLabel#inlineLabel {
+    font-size: 14px;
+    color: #444;
+    font-weight: 500;
+    padding: 0px;
+    margin: 0px;
+}
+
+/* 🔹 Radio Buttons */
+QRadioButton {
+    min-width: 70px;
+    font-weight: 500;
+    color: #333;
+    padding: 4px 15px;
+    spacing: 4px;
+    border-radius: 4px;
+    margin: 0px;
+}
+
+QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    border: 2px solid #cccccc;
+    background-color: #ffffff;
+    margin-right: 4px;
+}
+
+QRadioButton::indicator:checked {
+    background-color:rgb(68, 75, 81);
+    border: 2px solidrgb(28, 28, 28);
+}
+
+QRadioButton:hover {
+    color:rgb(56, 56, 56);
+}
+
+/* ✔️ גלגלת אנכית */
+QScrollBar:vertical {
+    border: none;
+    background: #f0f0f0;
+    width: 12px;
+}
+
+QScrollBar::handle:vertical {
+    background: #c0c0c0;
+    min-height: 20px;
+    border-radius: 6px;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    background: none;
+    height: 0px;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+}

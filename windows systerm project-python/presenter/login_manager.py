@@ -1,0 +1,89 @@
+import hashlib  # For hashing the password for comparison
+import requests
+from PySide6.QtWidgets import QMainWindow, QMessageBox
+from view.login import Ui_MainWindow
+from presenter.main_presenter import MainWindow
+import model.user
+
+
+def hash_password(password):
+    """Hash the password to match the hashedPassword format in the API."""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+
+def check_credentials(username, password):
+    try:
+        # Prepare the login payload
+        payload = {
+            "Username": username,
+            "Password": password
+        }
+
+        # Make a POST request to the login endpoint
+        response = requests.post('http://localhost:8000/api/v1/login', json=payload)
+        
+        if response.status_code == 200:
+            user_data = response.json()
+            # Save user data locally
+            model.user.save_username(username)
+            model.user.save_user_id(user_data['UserID'])
+            return True
+        elif response.status_code == 401:
+            print("Login failed: Invalid credentials")
+            return False
+        else:
+            print(f"Login failed with status: {response.status_code}")
+            print(response.text)
+            return False
+
+    except requests.RequestException as e:
+        print(f"Error while checking credentials: {e}")
+        return False
+
+
+class LoginWindow(QMainWindow):
+    def __init__(self, app):
+        super().__init__()
+        self.app = app  # שמירת QApplication לניהול נכון של האירועים
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+        # חיבור כפתור ההתחברות
+        self.ui.login.clicked.connect(self.handle_login)
+
+        # Apply the login window stylesheet
+        self.apply_stylesheet()
+
+    def apply_stylesheet(self):
+        # טעינת קובץ העיצוב
+        with open(r'view\loginWindowStyle.qss', 'r', encoding='utf-8') as style_file:
+            self.setStyleSheet(style_file.read())
+
+    def handle_login(self):
+        username = self.ui.userName.text()
+        password = self.ui.password.text()
+
+        if check_credentials(username, password):
+            # Hide the error message if login is successful
+            self.ui.wrongDetails.setVisible(False)
+            self.close()  # סגירת חלון ההתחברות
+            self.show_main_window()  # פתיחת החלון הראשי
+        else:
+            self.ui.wrongDetails.setText("Incorrect username or password!")
+            self.ui.wrongDetails.setVisible(True)  # Show the error message
+
+    def show_main_window(self):
+        from PySide6.QtWidgets import QApplication
+
+        # טעינת קובץ העיצוב
+        with open(r'view\mainWindowStyle.qss', 'r', encoding='utf-8') as style_file:
+            self.app.setStyleSheet(style_file.read())
+
+        self.main_window = MainWindow()
+        self.main_window.show()
+
+
+def show_login_window(app):
+    login_window = LoginWindow(app)
+    login_window.show()
+    app.exec()

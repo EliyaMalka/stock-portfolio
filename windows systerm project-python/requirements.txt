@@ -1,0 +1,7 @@
+requests==2.32.3
+PySide6==6.8.1.1
+matplotlib==3.10.0
+pandas==2.2.3
+qdrant-client==1.13.3
+sentence-transformers==4.0.2
+yfinance>=0.2.40  # Adding yfinance as it was missing but required

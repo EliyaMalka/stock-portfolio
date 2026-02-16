@@ -1,0 +1,172 @@
+/*= Style for mainwindow START
+  ==================================================== */
+#MainWindow {
+    background-color: #f8f9fa; /* רקע רך ואחיד */
+    font-family: 'Inter', 'Segoe UI', sans-serif; /* גופן מודרני */
+}
+/*= END
+  ==================================================== */
+
+/*= Style for button to change menu style START
+  ==================================================== */
+#menu {
+    padding: 5px;
+    border: none;
+    width: 15px;
+    height: 15px;
+    background-color:rgb(255, 255, 255); /* כחול עדין */
+    border-radius: 3px; /* פינות מעוגלות */
+    transition: background-color 0.2s ease; /* אפקט מעבר חלק */
+}
+
+#menu:hover {
+    background-color:rgb(198, 201, 197); /* כחול כהה יותר במעבר עכבר */
+}
+/*= END
+  ==================================================== */
+
+/*= Style for header widget START
+  ==================================================== */
+#widget {
+    background-color: #ffffff; /* רקע לבן */
+    border-bottom: 1px solid #e0e4e7; /* גבול עדין */
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* צל עדין */
+}
+/*= END
+  ==================================================== */
+
+/*= Style for menu with icon only START
+  ==================================================== */
+/* style for widget */
+#icon_only_widget {
+    background-color: #485c2f; /* רקע לבן */
+    border-right: 1px solid #e0e4e7; /* גבול עדין */
+    width: 60px; /* רוחב מעט גדול יותר */
+    border-radius: 8px; /* פינות מעוגלות */
+    padding: 10px;
+}
+
+/* style for QPushButton and QLabel */
+#icon_only_widget QPushButton, QLabel {
+    height: 50px;
+    border: none;
+    border-radius: 8px; /* פינות מעוגלות */
+    margin: 4px 0;
+    transition: background-color 0.2s ease; /* אפקט מעבר חלק */
+}
+
+#icon_only_widget QPushButton:hover {
+    background-color:rgb(88, 113, 57); /* רקע אפור רך במעבר עכבר */
+}
+
+/* style for logo image */
+#logo_label_1 {
+    padding: 0px;
+    margin-left: 4px;
+}
+/*= END
+  ==================================================== */
+
+/*= Style for menu with icon and text START
+  ==================================================== */
+/* style for widget */
+#full_menu_widget {
+    background-color: #ffffff; /* רקע לבן */
+    border-right: 1px solid #e0e4e7; /* גבול עדין */
+    border-radius: 8px; /* פינות מעוגלות */
+    padding: 20px;
+}
+
+/* style for QPushButton */
+#full_menu_widget QPushButton {
+    border: none;
+    border-radius: 8px; /* פינות מעוגלות */
+    text-align: left;
+    padding: 12px 16px; /* ריפוד נוח */
+    color: #4a5568; /* צבע טקסט אפור כהה */
+    font-size: 14px;
+    font-weight: 500; /* משקל גופן בינוני */
+    transition: all 0.2s ease; /* אפקט מעבר חלק */
+}
+
+#full_menu_widget QPushButton:hover {
+    background-color: #f1f3f5; /* רקע אפור רך במעבר עכבר */
+    color: #2d3748; /* צבע טקסט כהה יותר */
+}
+
+#full_menu_widget QPushButton:checked {
+    background-color: #485c2f; /* כחול עדין לכפתור נבחר */
+    color: #ffffff; /* טקסט לבן */
+}
+
+/* style for APP title */
+#logo_label_3 {
+    color: #2d3748; /* צבע טקסט כהה */
+    font-size: 26px;
+    font-weight: 600; /* משקל גופן בולט */
+    margin-left: -6px; /* מזיז שמאלה */
+    /*margin-bottom: 5px; מרווח נוסף מתחת לכותרת */
+}
+
+/* style for horizontal logo image */
+#logo_label_2 {
+    min-width: 50px;  /* גודל מתאים יותר כך שזה יהיה נראה */
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+}
+
+/*= END
+  ==================================================== */
+
+/*= Style for search button START
+  ==================================================== */
+#search_btn {
+    border: none;
+    background-color: transparent;
+    padding: 8px;
+    border-radius: 8px; /* פינות מעוגלות */
+    transition: background-color 0.2s ease; /* אפקט מעבר חלק */
+}
+
+#search_btn:hover {
+    background-color: #f1f3f5; /* רקע אפור רך במעבר עכבר */
+}
+/*= END
+  ==================================================== */
+
+/*= Style for search input START
+  ==================================================== */
+#search_input {
+    border: 1px solid #e0e4e7; /* גבול עדין */
+    border-radius: 8px; /* פינות מעוגלות */
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #4a5568; /* צבע טקסט אפור כהה */
+    background-color: #ffffff; /* רקע לבן */
+    transition: all 0.2s ease; /* אפקט מעבר חלק */
+}
+
+#search_input:focus {
+    border-color: #485c2f; /* גבול כחול בעת פוקוס */
+    box-shadow: 0 0 0 2px rgba(76, 110, 245, 0.1); /* צל עדין */
+}
+/*= END
+  ==================================================== */
+
+/*= Style for user information button START
+  ==================================================== */
+#user_btn {
+    border: none;
+    background-color: transparent;
+    padding: 8px;
+    border-radius: 8px; /* פינות מעוגלות */
+    transition: background-color 0.2s ease; /* אפקט מעבר חלק */
+}
+
+#user_btn:hover {
+    background-color: #f1f3f5; /* רקע אפור רך במעבר עכבר */
+}
+/*= END
+  ==================================================== */
