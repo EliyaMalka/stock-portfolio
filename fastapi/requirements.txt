@@ -7,3 +7,6 @@ email-validator
 passlib[bcrypt]
 argon2-cffi
 python-dotenv
+transformers
+torch --index-url https://download.pytorch.org/whl/cpu
+yfinance
