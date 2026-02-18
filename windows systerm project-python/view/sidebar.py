@@ -220,7 +220,11 @@ class Ui_MainWindow(object):
         self.chat_window = ChatWindow()  # Create an instance of ChatWindow
         self.customers_layout = QVBoxLayout(self.page_3)  
         self.customers_layout.addWidget(self.chat_window)  # Add the ChatWindow widget to the layout
-        self.page_3.setLayout(self.customers_layout)  
+        self.page_3.setLayout(self.customers_layout)
+        
+        # Link transactions window to chat window for auto-refresh
+        if hasattr(self, 'transactions_window'):
+            self.chat_window.set_transaction_window(self.transactions_window)  
 
         self.stackedWidget.addWidget(self.page_3)
         self.page_4 = QWidget()

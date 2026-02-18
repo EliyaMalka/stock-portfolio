@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QTextCursor
 from PySide6.QtCore import Qt, QThread, Signal, QFile, QTextStream, QTimer
 
-from model.chat_backend import rephrase_question, search_qdrant, generate_answer
+from model.chat_backend import get_chat_response
 
 
 class ChatWorker(QThread):
@@ -19,15 +19,8 @@ class ChatWorker(QThread):
 
     def run(self):
         try:
-            self.step_signal.emit("Rephrasing question")
-            rephrased = rephrase_question(self.question)
-
-            self.step_signal.emit("Searching in Qdrant")
-            context = search_qdrant(rephrased)
-
-            self.step_signal.emit("Generating answer")
-            answer = generate_answer(context, rephrased)
-
+            self.step_signal.emit("Agent thinking...")
+            answer = get_chat_response(self.question)
             self.result_signal.emit(answer)
         except Exception as e:
             self.result_signal.emit(f"[Error] {str(e)}")
@@ -114,6 +107,9 @@ class ChatWindow(QWidget):
         animated_text = f"{self.status_base_text}{dots}"
         self.append_or_update_status_line(animated_text)
 
+    def set_transaction_window(self, transaction_window):
+        self.transaction_window = transaction_window
+
     def display_answer(self, answer):
         if self.status_dot_timer:
             self.status_dot_timer.stop()
@@ -131,6 +127,10 @@ class ChatWindow(QWidget):
 
         self.send_button.setEnabled(True)
         self.last_status_position = None
+        
+        # Refresh transactions if linked
+        if hasattr(self, 'transaction_window') and self.transaction_window:
+            self.transaction_window.load_transactions()
 
 
 if __name__ == "__main__":
