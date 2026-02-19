@@ -95,6 +95,18 @@ class CQRSHandler:
                 raise HTTPException(status_code=400, detail="Insufficient funds")
             user.Balance -= total_amount
         elif command.Quantity < 0: # Sell (Quantity is negative, so total_amount is negative)
+            # Check if user has enough stock to sell
+            transactions = self.db.query(models.Transaction).filter(
+                models.Transaction.UserID == command.UserID,
+                models.Transaction.StockSymbol == command.StockSymbol
+            ).all()
+            
+            current_holdings = sum(t.Quantity for t in transactions)
+            
+            # command.Quantity is negative, so current_holdings + command.Quantity must be >= 0
+            if current_holdings + command.Quantity < 0:
+                raise HTTPException(status_code=400, detail=f"Insufficient stock holdings. You have {current_holdings} shares of {command.StockSymbol}.")
+
             # Subtracting a negative number adds to the balance
             user.Balance -= total_amount 
         
