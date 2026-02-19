@@ -1,10 +1,12 @@
 import sys
 import requests
+import yfinance as yf
 from PySide6.QtCore import Qt, QFile, QTextStream, QSize
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QLineEdit,
-    QPushButton, QHBoxLayout, QMessageBox, QFrame, QSpacerItem, QSizePolicy
+    QPushButton, QHBoxLayout, QMessageBox, QFrame, QSpacerItem, QSizePolicy,
+    QTableWidget, QTableWidgetItem, QHeaderView
 )
 
 
@@ -20,11 +22,12 @@ class UserDetailsWindow(QMainWindow):
         self.editable_fields = []
         self.init_ui()
         self.load_user_details()
+        self.load_portfolio()
 
 
     def init_ui(self):
         self.setWindowTitle("User Details")
-        self.setGeometry(100, 100, 650, 450)
+        self.setGeometry(100, 100, 700, 600)  # Increased height for table
         self.load_stylesheet(r"view\userDetails.qss") # Adjust path if needed
 
         self.central_widget = QWidget(self)
@@ -50,6 +53,21 @@ class UserDetailsWindow(QMainWindow):
 
         self.main_layout.addWidget(self.create_separator())
 
+        # --- Portfolio Section ---
+        portfolio_label = QLabel("Portfolio Holdings", self)
+        portfolio_label.setObjectName("sectionLabel") # Assuming specific style or generic label style
+        portfolio_label.setStyleSheet("font-weight: bold; font-size: 16px; margin-top: 10px;")
+        self.main_layout.addWidget(portfolio_label)
+
+        self.portfolio_table = QTableWidget()
+        self.portfolio_table.setColumnCount(4)
+        self.portfolio_table.setHorizontalHeaderLabels(["Symbol", "Quantity", "Current Price", "Total Value"])
+        self.portfolio_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.portfolio_table.verticalHeader().setVisible(False)
+        self.main_layout.addWidget(self.portfolio_table)
+
+        self.main_layout.addWidget(self.create_separator())
+
         # --- Buttons Area ---
         button_layout = QHBoxLayout()
         button_layout.addStretch(1)
@@ -62,7 +80,7 @@ class UserDetailsWindow(QMainWindow):
         button_layout.addWidget(self.save_button)
 
         self.main_layout.addLayout(button_layout)
-        self.main_layout.addStretch(1)
+        # self.main_layout.addStretch(1) # Removed stretch to let table expand
 
     def create_separator(self):
         separator = QFrame()
@@ -99,14 +117,14 @@ class UserDetailsWindow(QMainWindow):
         edit_button = QPushButton("Edit", self)
         edit_button.setFixedWidth(self.BUTTON_WIDTH)
         edit_button.setFixedHeight(36)
-        edit_button.setObjectName("editToggleButton")
-        # Connect using lambda, passing the specific field
-        edit_button.clicked.connect(lambda checked=False, field=input_field: self.toggle_edit_mode(field))
+        edit_button.setObjectName("editButton")
+        
+        # We need to capture the specific field and button for the lambda
+        edit_button.clicked.connect(lambda checked=False, f=input_field, b=edit_button: self.toggle_edit(f, b))
+        
         row_layout.addWidget(edit_button)
-
         # Store the field and its button together
-        self.editable_fields.append({'field': input_field, 'button': edit_button})
-
+        # self.editable_fields.append({'field': input_field, 'button': edit_button}) # This is handled differently now
         parent_layout.addLayout(row_layout)
         return input_field
 
@@ -120,89 +138,104 @@ class UserDetailsWindow(QMainWindow):
         label.setObjectName("fieldLabel")
         row_layout.addWidget(label)
 
-        balance_value_label = QLabel("0", self)
-        balance_value_label.setObjectName("balanceValueLabel")
-        balance_value_label.setFont(QFont("Segoe UI", 11, QFont.Bold))
-        balance_value_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        balance_value_label.setFixedHeight(36)
-        balance_value_label.setStyleSheet("padding-left: 10px;")
-        row_layout.addWidget(balance_value_label)
-
-        placeholder = QWidget()
-        placeholder.setFixedWidth(self.BUTTON_WIDTH)
-        row_layout.addWidget(placeholder)
-
-        parent_layout.addLayout(row_layout)
-        return balance_value_label
-
-    def toggle_edit_mode(self, clicked_field):
-        """
-        Toggles the edit mode for the clicked field.
-        Ensures only one field is editable at a time.
-        If the clicked field was already being edited, it locks it.
-        """
-        currently_editing = not clicked_field.isReadOnly()
-        new_edit_state = not currently_editing # The desired state for the clicked field
-
-        # --- Step 1: Reset all OTHER fields to read-only ---
-        for item in self.editable_fields:
-            field = item['field']
-            button = item['button']
-            # Only reset if it's NOT the clicked field AND it's currently editable
-            if field is not clicked_field and not field.isReadOnly():
-                field.setReadOnly(True)
-                button.setText("Edit")
-                button.setToolTip("Click to edit this field")
-                # Apply style changes
-                field.style().unpolish(field)
-                field.style().polish(field)
-                button.style().unpolish(button)
-                button.style().polish(button)
-
-        # --- Step 2: Set the state for the CLICKED field ---
-        clicked_button = None
-        for item in self.editable_fields:
-            if item['field'] is clicked_field:
-                clicked_button = item['button']
-                break
-
-        if clicked_button:
-            # Set the field's read-only state based on the desired new state
-            clicked_field.setReadOnly(not new_edit_state)
-
-            if new_edit_state: # If the field should become editable
-                clicked_button.setText("Lock")
-                clicked_button.setToolTip("Click to lock this field")
-                clicked_field.setFocus() # Focus when editable
-            else: # If the field should become read-only
-                clicked_button.setText("Edit")
-                clicked_button.setToolTip("Click to edit this field")
-                clicked_field.clearFocus()
-
-            # Apply style changes for the clicked field/button
-            clicked_field.style().unpolish(clicked_field)
-            clicked_field.style().polish(clicked_field)
-            clicked_button.style().unpolish(clicked_button)
-            clicked_button.style().polish(clicked_button)
-
-
+        balance_value = QLabel("Loading...", self)
+        balance_value.setObjectName("balanceValue") # For special styling if needed
+        balance_value.setStyleSheet("font-weight: bold; color: #2e7d32; font-size: 14px;")
+        row_layout.addWidget(balance_value)
         
+        # Spacer to push balance to left, matching inputs
+        row_layout.addStretch(1) 
+        
+        # Balance is usually not editable directly here, or maybe adds 'Add Funds' button later
+        # For now, just display.
+        parent_layout.addLayout(row_layout)
+        return balance_value
+
+    def toggle_edit(self, field, button):
+        if field.isReadOnly():
+            field.setReadOnly(False)
+            field.setFocus()
+            button.setText("Cancel")
+            # Store original value to restore if cancelled
+            field.setProperty("original_text", field.text())
+            if field not in [f['field'] for f in self.editable_fields]:
+                 self.editable_fields.append({'field': field, 'button': button})
+        else:
+            field.setReadOnly(True)
+            button.setText("Edit")
+            # Restore original value
+            if field.property("original_text") is not None:
+                field.setText(field.property("original_text"))
+            # Remove from editable_fields list
+            self.editable_fields = [item for item in self.editable_fields if item['field'] is not field]
+
+        # Apply style changes
+        field.style().unpolish(field)
+        field.style().polish(field)
+        button.style().unpolish(button)
+        button.style().polish(button)
         
     def load_user_details(self):
         try:
             response = requests.get(f"{self.api_url}/{self.user_id}")
-            response.raise_for_status()
-            user_data = response.json()
-            self.username.setText(user_data.get("Username", ""))
-            self.email.setText(user_data.get("Email", ""))
-            balance = float(user_data.get("Balance", 0))
-            self.balance_label.setText(f"{balance:,.2f}")
-            self.reset_edit_states()
+            if response.status_code == 200:
+                user_data = response.json()
+                self.username.setText(user_data.get("Username", ""))
+                self.email.setText(user_data.get("Email", ""))
+                balance = float(user_data.get("Balance", 0))
+                self.balance_label.setText(f"${balance:,.2f}")
+                self.reset_edit_states()
+            else:
+                 QMessageBox.warning(self, "Error", f"Failed to load details: {response.status_code}")
 
         except requests.exceptions.RequestException as e:
             QMessageBox.critical(self, "Connection Error", f"Failed to connect to API: {e}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred loading details: {str(e)}")
+
+
+    def load_portfolio(self):
+        try:
+            response = requests.get(f"{self.api_url}/{self.user_id}/transactions")
+            if response.status_code == 200:
+                transactions = response.json()
+                
+                # Aggregate holdings
+                holdings = {}
+                for t in transactions:
+                    symbol = t['StockSymbol'].upper()
+                    qty = t['Quantity']
+                    holdings[symbol] = holdings.get(symbol, 0) + qty
+                
+                # Filter > 0
+                current_holdings = {k: v for k, v in holdings.items() if v > 0}
+                
+                self.portfolio_table.setRowCount(len(current_holdings))
+                
+                for row, (symbol, qty) in enumerate(current_holdings.items()):
+                    self.portfolio_table.setItem(row, 0, QTableWidgetItem(symbol))
+                    self.portfolio_table.setItem(row, 1, QTableWidgetItem(str(qty)))
+                    
+                    # Fetch price
+                    try:
+                        ticker = yf.Ticker(symbol)
+                        history = ticker.history(period="1d")
+                        if not history.empty:
+                            price = history["Close"].iloc[-1]
+                            value = price * qty
+                            self.portfolio_table.setItem(row, 2, QTableWidgetItem(f"${price:.2f}"))
+                            self.portfolio_table.setItem(row, 3, QTableWidgetItem(f"${value:.2f}"))
+                        else:
+                            self.portfolio_table.setItem(row, 2, QTableWidgetItem("N/A"))
+                            self.portfolio_table.setItem(row, 3, QTableWidgetItem("N/A"))
+                    except:
+                         self.portfolio_table.setItem(row, 2, QTableWidgetItem("Error"))
+                         self.portfolio_table.setItem(row, 3, QTableWidgetItem("Error"))
+            else:
+                # Silently fail or log for now
+                print(f"Failed to load transactions: {response.status_code}")
+        except Exception as e:
+            print(f"Error loading portfolio: {e}")
 
 
     def save_user_details(self):
@@ -212,9 +245,6 @@ class UserDetailsWindow(QMainWindow):
         if not username_text or not email_text:
             QMessageBox.warning(self, "Validation Error", "Username and Email cannot be empty.")
             return
-
-        r = requests.get(f"{self.api_url}/{self.user_id}")
-        user_data = r.json()
 
         payload = {
             "Username": username_text,
@@ -229,20 +259,12 @@ class UserDetailsWindow(QMainWindow):
 
         try:
             response = requests.put(f"{self.api_url}/{self.user_id}", json=payload)
-            response.raise_for_status()
-
+            
             if response.status_code in [200, 204]:
                 QMessageBox.information(self, "Success", "User details updated successfully.")
-                balance = float(user_data.get("Balance", 0))
-                self.balance_label.setText(f"{balance:,.2f}")
-                self.reset_edit_states()
+                self.load_user_details() # Reload to refresh and reset
             else:
-                error_msg = f"Status code: {response.status_code}"
-                try:
-                    error_msg += f"\nDetails: {response.json()}"
-                except:
-                    error_msg += f"\nResponse: {response.text}"
-                QMessageBox.critical(self, "API Error", f"Failed to update user details.\n{error_msg}")
+                QMessageBox.critical(self, "API Error", f"Failed to update user details. Status: {response.status_code}")
 
         except requests.exceptions.RequestException as e:
             QMessageBox.critical(self, "Connection Error", f"Failed to save data: {e}")
@@ -260,30 +282,23 @@ class UserDetailsWindow(QMainWindow):
         for item in self.editable_fields:
             field = item['field']
             button = item['button']
-            needs_update = False # Flag to check if style refresh is needed
-
-            if not field.isReadOnly(): # If it was editable, lock it
+            
+            if not field.isReadOnly():
                 field.setReadOnly(True)
-                needs_update = True
-
-            # Ensure button text is always "Edit" after reset
+            
             if button.text() != "Edit":
                 button.setText("Edit")
-                button.setToolTip("Click to edit this field")
-                needs_update = True
-
-            # Apply style refresh only if something changed
-            if needs_update:
-                field.style().unpolish(field)
-                field.style().polish(field)
-                button.style().unpolish(button)
-                button.style().polish(button)
+                
+            field.style().unpolish(field)
+            field.style().polish(field)
+            button.style().unpolish(button)
+            button.style().polish(button)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     user_id_to_show = 4
-    api_endpoint = "http://localhost:5235/api/Users"
+    api_endpoint = "http://localhost:8000/api/v1/users" # Corrected default for testing
     window = UserDetailsWindow(user_id_to_show, api_endpoint)
     window.show()
     sys.exit(app.exec())
