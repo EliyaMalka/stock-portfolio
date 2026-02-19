@@ -240,9 +240,10 @@ def analyze_stock_sentiment(symbol: str) -> str:
         return f"Failed to connect to sentiment service: {e}"
 
 @tool
-def add_funds(amount: float) -> str:
+def deposit_funds(amount: float) -> str:
     """
-    Adds funds to the user's balance.
+    DEPOSITS (ADDS) money into the user's account balance.
+    Use this when the user says "add funds", "deposit money", or "top up".
     Args:
         amount: The amount to add (must be positive).
     """
@@ -255,16 +256,17 @@ def add_funds(amount: float) -> str:
         response = requests.post(f"http://localhost:8000/api/v1/users/{user_id}/balance/add", json=payload)
         
         if response.status_code == 200:
-            return f"✅ Successfully added ${amount:.2f} to your account."
+            return f"✅ Successfully deposited ${amount:.2f} into your account."
         else:
-            return f"Error adding funds: {response.status_code} - {response.text}"
+            return f"Error depositing funds: {response.status_code} - {response.text}"
     except Exception as e:
-        return f"Failed to add funds: {e}"
+        return f"Failed to deposit funds: {e}"
 
 @tool
 def withdraw_funds(amount: float) -> str:
     """
-    Withdraws funds from the user's balance.
+    WITHDRAWS (REMOVES) money from the user's account balance.
+    Use this when the user says "withdraw funds", "cash out", or "take money".
     Args:
         amount: The amount to withdraw (must be positive).
     """
@@ -342,7 +344,7 @@ def get_user_portfolio() -> str:
 # === Agent Setup ===
 
 # Tools list
-tools = [buy_stock, sell_stock, get_stock_price, search_knowledge_base, get_user_details, get_user_portfolio, check_portfolio_risks, analyze_stock_sentiment, add_funds, withdraw_funds]
+tools = [buy_stock, sell_stock, get_stock_price, search_knowledge_base, get_user_details, get_user_portfolio, check_portfolio_risks, analyze_stock_sentiment, deposit_funds, withdraw_funds]
 
 # Initialize LLM with tools
 llm = ChatOllama(model=MODEL_NAME, temperature=0).bind_tools(tools)
@@ -364,7 +366,10 @@ Rules:
 -   **Trust the tool outputs.** If a tool says "No risks" or "Sentiment is Positive", report that accurately.
 -   **Conditional Execution**: If the user asks to "Buy X if sentiment is good" or "Sell Y if bad", you MUST first run `analyze_stock_sentiment` and then immediately run `buy_stock` or `sell_stock` based on the result. 
 -   **Verbal Confirmation**: When you execute a trade (buy/sell), your response MUST confirm the action (e.g., "I've sold 2 NVDA stocks as requested because sentiment was negative."). DO NOT say you cannot provide financial advice if you just performed the action.
--   **Balance Updates**: When adding or withdrawing funds, confirm the action ONLY. DO NOT state the new total balance unless explicitly asked.
+-   **Balance Updates**: When adding or withdrawing funds, confirm the action ONLY. DO NOT state the new total balance unless explicitly asked, no matter what, only state how much was added or withdrawn.
+-   **Tool Selection for Balance**: 
+    -   Use `deposit_funds` for "add", "deposit", "top up".
+    -   Use `withdraw_funds` for "withdraw", "remove", "take out".
 -   When buying/selling or managing balance, confirm the action explicitly.
 -   If asked about your tools, list them.
 """
