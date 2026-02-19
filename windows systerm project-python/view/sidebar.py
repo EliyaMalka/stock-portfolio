@@ -347,10 +347,11 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate(
-            "MainWindow", u"MainWindow", None))
+            "MainWindow", u"Stock Portfolio", None))
+        MainWindow.setWindowIcon(QIcon(":/icons/icons/LogoGreen.png"))
         self.logo_label_2.setText("")
         self.logo_label_3.setText(QCoreApplication.translate(
-            "MainWindow", u"StockWise", None))
+            "MainWindow", u"Stock-Portfolio", None))
         self.home_btn_2.setText(
             QCoreApplication.translate("MainWindow", u"Home", None))
         self.dashboard_btn_2.setText(

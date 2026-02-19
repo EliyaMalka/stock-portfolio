@@ -34,7 +34,7 @@ QLineEdit:focus {
 
 /* כפתור שליחה */
 QPushButton {
-    background-color: #485c2f;
+    background-color: #6c5ce7; /* Purple base */
     color: white;
     border: none;
     border-radius: 6px;
@@ -44,15 +44,15 @@ QPushButton {
 }
 
 QPushButton:hover {
-    background-color: #3d5129;
+    background-color: #5b4cc4; /* Darker purple on hover */
 }
 
 QPushButton:pressed {
-    background-color: #344624;
+    background-color: #4a3ca1; /* Even darker purple on press */
 }
 
 QPushButton:disabled {
-    background-color: #9dab8c;
+    background-color: #a29bfe; /* Light purple for disabled */
     color: white;
     opacity: 0.6;
 }
