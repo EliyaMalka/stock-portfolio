@@ -215,6 +215,75 @@ def check_portfolio_risks(dummy: str = "") -> str:
         return f"Failed to connect to risk service: {e}"
 
 @tool
+def analyze_stock_sentiment(symbol: str) -> str:
+    """
+    Performs an on-demand sentiment analysis for a specific stock symbol using FinBERT.
+    Use this when the user asks "How is AAPL doing?" or "Check sentiment for NVDA".
+    """
+    try:
+        payload = {"symbol": symbol}
+        response = requests.post("http://localhost:8000/api/v1/sentiment/analyze", json=payload)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            summary = f"📊 **Sentiment Analysis for {data['symbol']}**:\n"
+            summary += f"**Overall Sentiment**: {data['overall_sentiment']} (Score: {data['average_score']:.2f})\n\n"
+            summary += "**Key Headlines**:\n"
+            for headline in data['headlines']:
+                summary += f"- {headline}\n"
+                
+            return summary
+        else:
+            return f"Error analyzing sentiment: {response.status_code} - {response.text}"
+    except Exception as e:
+        return f"Failed to connect to sentiment service: {e}"
+
+@tool
+def add_funds(amount: float) -> str:
+    """
+    Adds funds to the user's balance.
+    Args:
+        amount: The amount to add (must be positive).
+    """
+    try:
+        user_id = user_model.load_user_id()
+        if not user_id:
+            return "Error: Could not identify current user."
+
+        payload = {"amount": amount}
+        response = requests.post(f"http://localhost:8000/api/v1/users/{user_id}/balance/add", json=payload)
+        
+        if response.status_code == 200:
+            return f"✅ Successfully added ${amount:.2f} to your account."
+        else:
+            return f"Error adding funds: {response.status_code} - {response.text}"
+    except Exception as e:
+        return f"Failed to add funds: {e}"
+
+@tool
+def withdraw_funds(amount: float) -> str:
+    """
+    Withdraws funds from the user's balance.
+    Args:
+        amount: The amount to withdraw (must be positive).
+    """
+    try:
+        user_id = user_model.load_user_id()
+        if not user_id:
+            return "Error: Could not identify current user."
+
+        payload = {"amount": amount}
+        response = requests.post(f"http://localhost:8000/api/v1/users/{user_id}/balance/withdraw", json=payload)
+        
+        if response.status_code == 200:
+            return f"✅ Successfully withdrew ${amount:.2f} from your account."
+        else:
+            return f"Error withdrawing funds: {response.status_code} - {response.text}"
+    except Exception as e:
+        return f"Failed to withdraw funds: {e}"
+
+@tool
 def get_user_portfolio() -> str:
     """Gets the current user's portfolio holdings (stocks owned) and their current market value."""
     try:
@@ -273,7 +342,7 @@ def get_user_portfolio() -> str:
 # === Agent Setup ===
 
 # Tools list
-tools = [buy_stock, sell_stock, get_stock_price, search_knowledge_base, get_user_details, get_user_portfolio, check_portfolio_risks]
+tools = [buy_stock, sell_stock, get_stock_price, search_knowledge_base, get_user_details, get_user_portfolio, check_portfolio_risks, analyze_stock_sentiment, add_funds, withdraw_funds]
 
 # Initialize LLM with tools
 llm = ChatOllama(model=MODEL_NAME, temperature=0).bind_tools(tools)
@@ -286,11 +355,17 @@ Your Capabilities:
 2.  **Market Data**: Get real-time stock prices.
 3.  **Knowledge Base**: Answer general financial questions using RAG.
 4.  **Risk Monitor**: Check for negative news/risks affecting the user's stocks.
+5.  **Sentiment Analysis**: Analyze specific stocks on demand (e.g., "How is AAPL doing?").
+6.  **Balance Management**: Add or withdraw funds from user account.
 
 Rules:
 -   **Always** check for risks (`check_portfolio_risks`) if the user asks "How is my portfolio doing?", "Is my money safe?", or "Any bad news?".
--   **Trust the `check_portfolio_risks` tool output.** If it says "No high-risk alerts", explicitly tell the user that their stocks are safe based on the latest news scan. Do NOT give generic market advice unless asked.
--   When buying/selling, confirm the action explicitly.
+-   **Use `analyze_stock_sentiment`** if the user asks about the performance or news of a specific stock (e.g., "How is NVDA performing lately?").
+-   **Trust the tool outputs.** If a tool says "No risks" or "Sentiment is Positive", report that accurately.
+-   **Conditional Execution**: If the user asks to "Buy X if sentiment is good" or "Sell Y if bad", you MUST first run `analyze_stock_sentiment` and then immediately run `buy_stock` or `sell_stock` based on the result. 
+-   **Verbal Confirmation**: When you execute a trade (buy/sell), your response MUST confirm the action (e.g., "I've sold 2 NVDA stocks as requested because sentiment was negative."). DO NOT say you cannot provide financial advice if you just performed the action.
+-   **Balance Updates**: When adding or withdrawing funds, confirm the action ONLY. DO NOT state the new total balance unless explicitly asked.
+-   When buying/selling or managing balance, confirm the action explicitly.
 -   If asked about your tools, list them.
 """
 

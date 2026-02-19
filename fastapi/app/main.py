@@ -11,9 +11,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.include_router(endpoints.router, prefix="/api/v1")
-from app.routers import alerts
+from app.routers import users, transactions, alerts, sentiment
+
+app.include_router(users.router, prefix="/api/v1")
+app.include_router(transactions.router, prefix="/api/v1")
 app.include_router(alerts.router, prefix="/api/v1")
+app.include_router(sentiment.router, prefix="/api/v1")
 
 # Background Task Integration
 import asyncio

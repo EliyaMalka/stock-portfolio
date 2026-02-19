@@ -375,4 +375,5 @@ class Ui_MainWindow(object):
         """Update the user details window when navigating to the last page."""
         if self.customer_btn_2.isChecked():  # בדוק אם הכפתור נלחץ
             self.user_details_window.load_user_details()  # טען מחדש את פרטי המשתמש
+            self.user_details_window.load_portfolio() # Refresh portfolio holdings
             self.stackedWidget.setCurrentIndex(self.stackedWidget.indexOf(self.page_4))  # עבור לדף האחרון
