@@ -18,7 +18,7 @@ QTabBar {
 
 QTabBar::tab {
     background: transparent;
-    color: #4a5568;
+    color: #ffffff;
     font-size: 16px;
     font-weight: bold;
     padding: 12px;
@@ -31,17 +31,17 @@ QTabBar::tab {
 
 	
 QTabBar::tab:selected {
-    color: #485c2f;
-    color: #485c2f;
-    border-bottom: 3px solid #485c2f;
+    color: #ffffff;
+    color: #ffffff;
+    border-bottom: 3px solid #ffffff;
     font-size: 18px;
     background-color: transparent;
 }
 
 QTabBar::tab:hover {
-    color: #5a7240;
-    color: #5a7240;
-    border-bottom: 3px solid #5a7240;
+    color: #ffffff;
+    color: #ffffff;
+    border-bottom: 3px solid #ffffff;
     font-size: 17px;
 }
 
@@ -91,7 +91,16 @@ QLineEdit#wrongDetails {
 }
 
 /* ========== כפתורים (התחברות ורישום) ========== */
-QPushButton#login,
+QPushButton#login {
+    background-color: #1a73e8;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
 QPushButton#signup {
     background-color: #485c2f;
     border: none;
@@ -102,12 +111,18 @@ QPushButton#signup {
     color: #ffffff;
 }
 
-QPushButton#login:hover,
+QPushButton#login:hover {
+    background-color: #1558b0;
+}
+
 QPushButton#signup:hover {
     background-color: #5a7240;
 }
 
-QPushButton#login:pressed,
+QPushButton#login:pressed {
+    background-color: #0d3e7a;
+}
+
 QPushButton#signup:pressed {
     background-color: #374725;
 }
