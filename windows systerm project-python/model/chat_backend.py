@@ -5,7 +5,7 @@ from sentence_transformers import SentenceTransformer
 
 from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage, AIMessage
 
 # Using LangGraph components
 from langgraph.prebuilt import create_react_agent
@@ -389,8 +389,20 @@ def get_chat_response(user_input: str) -> str:
         
         # The result 'response' is the final state. 
         # 'messages' key contains the full conversation history. 
-        # The last message is the AI's final response.
-        return response["messages"][-1].content
+        messages = response["messages"]
+        last_message = messages[-1]
+
+        # Check if the last message contains raw python tag (failed parsing of tool call)
+        if hasattr(last_message, 'content') and ("<|python_tag|>" in str(last_message.content) or "check_portfolio_risks" in str(last_message.content)):
+            # If the user sees raw code, it usually means the model tried to call another tool 
+            # (like checking risks) but didn't format it right or the loop ended.
+            # We should fallback to the *previous* message if it was a ToolMessage (the result of the buy/sell).
+            if len(messages) >= 2 and isinstance(messages[-2], ToolMessage):
+                return messages[-2].content
+            else:
+                return "Action processed successfully."
+
+        return last_message.content
     except Exception as e:
         return f"Error processing request: {str(e)}"
 

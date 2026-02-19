@@ -56,7 +56,7 @@ class UserDetailsWindow(QMainWindow):
         # --- Portfolio Section ---
         portfolio_label = QLabel("Portfolio Holdings", self)
         portfolio_label.setObjectName("sectionLabel") # Assuming specific style or generic label style
-        portfolio_label.setStyleSheet("font-weight: bold; font-size: 16px; margin-top: 10px;")
+        portfolio_label.setStyleSheet("font-weight: bold; font-size: 16px; margin-top: 10px; color: #2b2b2b;")
         self.main_layout.addWidget(portfolio_label)
 
         self.portfolio_table = QTableWidget()

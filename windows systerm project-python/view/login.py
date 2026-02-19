@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PySide6.QtCore import Qt, QRect, QCoreApplication, QMetaObject
-from PySide6.QtGui import QFont, QPixmap
+from PySide6.QtGui import QFont, QPixmap, QIcon
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QLineEdit,
                                QPushButton, QTabWidget, QMenuBar, QStatusBar,QLabel)
 
@@ -21,7 +21,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setFixedSize(1000, 650)
         MainWindow.setFixedSize(1000, 650)
         self.bg_label = QLabel(self.centralwidget)
-        self.bg_label.setPixmap(QPixmap(":/icons/images/loginBG.png"))
+        self.bg_label.setPixmap(QPixmap(":/icons/images/loginBG.jpg"))
         self.bg_label.setGeometry(0, 0, 1000, 650)
         self.bg_label.lower() 
 
@@ -129,6 +129,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", "Login / SignUp", None))
+        MainWindow.setWindowIcon(QIcon(":/icons/icons/LogoGreen.png"))
 
 
 if __name__ == "__main__":

@@ -22,6 +22,6 @@
     <file>icons/stock_horizontal.png</file>
     <file>icons/stock_vertical.png</file>
     <file>icons/user-48.ico</file>
-    <file>images/loginBG.png</file>
+    <file>images/loginBG.jpg</file>
   </qresource>
 </RCC>

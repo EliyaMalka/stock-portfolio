@@ -40,7 +40,7 @@
   ==================================================== */
 /* style for widget */
 #icon_only_widget {
-    background-color: #485c2f; /* רקע לבן */
+    background-color: #1a73e8; /* רקע כחול */
     border-right: 1px solid #e0e4e7; /* גבול עדין */
     width: 60px; /* רוחב מעט גדול יותר */
     border-radius: 8px; /* פינות מעוגלות */
@@ -57,7 +57,7 @@
 }
 
 #icon_only_widget QPushButton:hover {
-    background-color:rgb(88, 113, 57); /* רקע אפור רך במעבר עכבר */
+    background-color: #1558b0; /* רקע כחול כהה יותר במעבר עכבר */
 }
 
 /* style for logo image */
@@ -96,7 +96,7 @@
 }
 
 #full_menu_widget QPushButton:checked {
-    background-color: #485c2f; /* כחול עדין לכפתור נבחר */
+    background-color: #1a73e8; /* כחול עדין לכפתור נבחר */
     color: #ffffff; /* טקסט לבן */
 }
 
@@ -149,7 +149,7 @@
 }
 
 #search_input:focus {
-    border-color: #485c2f; /* גבול כחול בעת פוקוס */
+    border-color: #1a73e8; /* גבול כחול בעת פוקוס */
     box-shadow: 0 0 0 2px rgba(76, 110, 245, 0.1); /* צל עדין */
 }
 /*= END
