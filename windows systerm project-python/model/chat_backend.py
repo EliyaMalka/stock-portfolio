@@ -191,6 +191,30 @@ def get_stock_price(symbol: str) -> str:
         return f"Error fetching price: {str(e)}"
 
 @tool
+def check_portfolio_risks(dummy: str = "") -> str:
+    """
+    Checks for high-risk alerts (negative news) affecting the user's portfolio.
+    Returns a summary of any active alerts.
+    """
+    try:
+        # Currently hardcoded to localhost:8000, consistent with other tools
+        response = requests.get("http://localhost:8000/api/v1/alerts/unread")
+        if response.status_code == 200:
+            alerts = response.json()
+            if not alerts:
+                return "✅ SUCCESS: I have scanned the database for negative news on your portfolio stocks. No high-risk alerts were found. Your portfolio sentiment is currently stable/positive."
+            
+            summary = "⚠️ **High Risk Alerts Detected:**\n"
+            for alert in alerts:
+                summary += f"- **{alert['stock_symbol']}**: {alert['headline']} (Sentiment: {alert['sentiment_score']:.2f})\n"
+            
+            return summary
+        else:
+            return f"Error checking alerts: {response.status_code}"
+    except Exception as e:
+        return f"Failed to connect to risk service: {e}"
+
+@tool
 def get_user_portfolio() -> str:
     """Gets the current user's portfolio holdings (stocks owned) and their current market value."""
     try:
@@ -249,21 +273,25 @@ def get_user_portfolio() -> str:
 # === Agent Setup ===
 
 # Tools list
-tools = [search_knowledge_base, buy_stock, sell_stock, get_stock_price, get_user_details, get_user_portfolio]
+tools = [buy_stock, sell_stock, get_stock_price, search_knowledge_base, get_user_details, get_user_portfolio, check_portfolio_risks]
 
 # Initialize LLM with tools
 llm = ChatOllama(model=MODEL_NAME, temperature=0).bind_tools(tools)
 
 # System Prompt
-system_prompt = """You are a stock trading assistant. 
-You can buy/sell stocks, check stock prices, check user details (balance), check portfolio holdings, and answer questions using your knowledge base.
+system_prompt = """You are a proactive financial assistant. 
+
+Your Capabilities:
+1.  **Manage Portfolio**: Buy/Sell stocks and view current holdings.
+2.  **Market Data**: Get real-time stock prices.
+3.  **Knowledge Base**: Answer general financial questions using RAG.
+4.  **Risk Monitor**: Check for negative news/risks affecting the user's stocks.
 
 Rules:
-1. ONLY use the tools provided. Do not hallucinate other tools.
-2. If you need to check the user's balance, use 'get_user_details'.
-3. If the user asks about their stocks/holdings/portfolio, use 'get_user_portfolio'.
-4. After buying/selling, you can confirm the action. 
-5. If the user asks a question you don't know, use 'search_knowledge_base'.
+-   **Always** check for risks (`check_portfolio_risks`) if the user asks "How is my portfolio doing?", "Is my money safe?", or "Any bad news?".
+-   **Trust the `check_portfolio_risks` tool output.** If it says "No high-risk alerts", explicitly tell the user that their stocks are safe based on the latest news scan. Do NOT give generic market advice unless asked.
+-   When buying/selling, confirm the action explicitly.
+-   If asked about your tools, list them.
 """
 
 # Creating graph agent (ReAct style) using langgraph prebuilt

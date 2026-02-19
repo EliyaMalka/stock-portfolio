@@ -1,3 +1,5 @@
+from app.domain.models import SentimentAlert
+from datetime import datetime
 import asyncio
 from app.services.portfolio_service import PortfolioService
 from app.services.news_service import NewsService
@@ -18,11 +20,9 @@ class BackgroundMonitor:
             try:
                 # 1. Get Active Stocks
                 db = SessionLocal()
-                # For this example, we'll check for User ID 4 (the active user in your flow)
-                # In a real app, you'd loop through all users or unique stocks
-                active_tickers = PortfolioService(db).get_active_holdings(user_id=4)
-                db.close()
-
+                # Check for ALL unique stocks held by any user
+                active_tickers = PortfolioService(db).get_all_active_stocks()
+                
                 if not active_tickers:
                     print("No active stocks found to monitor.")
                 else:
@@ -39,9 +39,27 @@ class BackgroundMonitor:
                             # Log risk if significantly negative
                             if score < -0.7:
                                 print(f"⚠️ [RISK ALERT] {ticker}: Sentiment {score:.2f} | Headline: {headline}")
-                                # TODO: Save this alert to DB for the Agent to pick up
+                                
+                                # Save to DB
+                                alert = SentimentAlert(
+                                    stock_symbol=ticker,
+                                    sentiment_score=score,
+                                    headline=headline,
+                                    timestamp=datetime.utcnow(),
+                                    is_read=0
+                                )
+                                db.add(alert)
+                                db.commit()
+                                
                             elif score > 0.7:
                                 print(f"✅ [OPPORTUNITY] {ticker}: Sentiment {score:.2f} | Headline: {headline}")
+                
+                db.close()
+
+            except Exception as e:
+                print(f"Error in background monitor: {e}")
+                if 'db' in locals():
+                    db.close()
 
             except Exception as e:
                 print(f"Error in background monitor: {e}")

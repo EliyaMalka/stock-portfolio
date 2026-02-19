@@ -12,13 +12,21 @@ app = FastAPI(
 )
 
 app.include_router(endpoints.router, prefix="/api/v1")
+from app.routers import alerts
+app.include_router(alerts.router, prefix="/api/v1")
 
 # Background Task Integration
 import asyncio
-from app.background.scheduler.py import BackgroundMonitor
+from app.background.scheduler import BackgroundMonitor
 
 @app.on_event("startup")
 async def startup_event():
+    # Ensure tables are created
+    # In production, use migrations (Alembic). For dev, this is fine.
+    # We need to import the model so Base knows about it
+    from app.domain.models import SentimentAlert, Base
+    Base.metadata.create_all(bind=engine)
+    
     monitor = BackgroundMonitor()
     # Run in background without blocking the server
     asyncio.create_task(monitor.start_monitoring())

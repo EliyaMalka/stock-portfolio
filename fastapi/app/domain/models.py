@@ -25,3 +25,14 @@ class Transaction(Base):
     TransactionDate = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="transactions")
+
+class SentimentAlert(Base):
+    __tablename__ = "SentimentAlerts"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    stock_symbol = Column(String(10), nullable=False)
+    sentiment_score = Column(DECIMAL(10, 4), nullable=False)
+    headline = Column(String(500), nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    is_read = Column(Integer, default=0) # Using Integer as boolean (0/1) for wide compatibility if needed, or Boolean
+
