@@ -380,7 +380,7 @@ agent_graph = create_react_agent(llm, tools, prompt=system_prompt)
 
 def get_chat_response(user_input: str) -> str:
     """
-    Main entry point for the chat interface.
+    נקודת הכניסה הראשית לממשק הצ'אט.
     """
     try:
         # LangGraph invoke takes {"messages": [...]}

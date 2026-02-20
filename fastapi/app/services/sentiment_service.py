@@ -3,14 +3,14 @@ import torch
 
 class SentimentService:
     """
-    Singleton service responsible for performing NLP sentiment analysis.
-    Uses the pre-trained FinBERT model via Hugging Face Transformers to analyze 
-    financial text (like news headlines) and determine if it's positive or negative.
+    שירות סינגלטון האחראי על ביצוע ניתוח סנטימנט ב-NLP.
+    משתמש במודל FinBERT מאומן מראש דרך Hugging Face Transformers לניתוח
+    טקסט פיננסי (כמו כותרות חדשות) ולקבוע אם הוא חיובי או שלילי.
     """
     _instance = None
 
     def __new__(cls):
-        """Ensures only one instance of the SentimentService (and the heavy model) is loaded."""
+        """מבטיח שרק מופע אחד של SentimentService (והמודל הכבד) ייטען."""
         if cls._instance is None:
             cls._instance = super(SentimentService, cls).__new__(cls)
             cls._instance.initialize_model()
@@ -18,8 +18,8 @@ class SentimentService:
 
     def initialize_model(self):
         """
-        Loads the FinBERT tokenizer and sequence classification model into memory.
-        Sets up the Hugging Face pipeline for sentiment analysis.
+        טוען את המטוקן (tokenizer) ומודל סיווג הרצפים של FinBERT לזיכרון.
+        מגדיר את ה-pipeline של Hugging Face לניתוח סנטימנט.
         """
         print("Loading FinBERT model... This may take a while using CPU.")
         self.model_name = "ProsusAI/finbert"
@@ -34,11 +34,11 @@ class SentimentService:
 
     def analyze(self, text: str) -> float:
         """
-        Analyzes a given text string (e.g., a news headline).
-        Returns a numerical sentiment score:
-        - Values close to 1.0 are highly positive.
-        - Values close to -1.0 are highly negative.
-        - Values close to 0.0 are neutral.
+        מנתח מחרוזת טקסט נתונה (לדוגמה, כותרת חדשות).
+        מחזיר ציון סנטימנט מספרי:
+        - ערכים קרובים ל-1.0 הם חיוביים מאוד.
+        - ערכים קרובים ל- -1.0 הם שליליים מאוד.
+        - ערכים קרובים ל-0.0 הם ניטרליים.
         """
         if not self.analyzer:
             return 0.0

@@ -1,20 +1,20 @@
 """
-Main Window Presenter.
+מנהל/מציג (Presenter) של החלון הראשי.
 
-Handles the logic for the main application window after a successful login.
-Manages the sidebar navigation and switching between different views (pages) 
-within the stacked widget.
+מטפל בלוגיקה עבור חלון השתמש הראשי לאחר התחברות מוצלחת.
+מנהל את הניווט בסרגל הצד ומעבר בין תצוגות (עמודים) שונות
+בתוך ה-stacked widget.
 """
 from PySide6.QtWidgets import QMainWindow
 from view.sidebar import Ui_MainWindow  # טעינת ממשק ה-UI
 
 class MainWindow(QMainWindow):
     """
-    Presenter class for the main application window.
-    Connects the sidebar buttons to the corresponding pages in the stacked widget.
+    מחלקת Presenter עבור חלון היישום הראשי.
+    מחברת את כפתורי סרגל הצד לעמודים התואמים ב-stacked widget.
     """
     def __init__(self):
-        """Initializes the UI, hides default icons, and connects navigation buttons."""
+        """מאתחל את ממשק המשתמש, מסתיר סמלי ברירת מחדל ומחבר את כפתורי הניווט."""
         super(MainWindow, self).__init__()
 
         self.ui = Ui_MainWindow()
@@ -36,8 +36,8 @@ class MainWindow(QMainWindow):
 
     def change_page(self, index, message):
         """
-        General function to switch the active page in the stacked widget
-        and print a debug message to the console.
+        פונקציה כללית להחלפת העמוד הפעיל ב-stacked widget
+        והדפסת הודעת ניפוי שגיאות (debug) לקונסולה.
         """
         print(message)
         self.ui.stackedWidget.setCurrentIndex(index)

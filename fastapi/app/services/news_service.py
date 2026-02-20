@@ -3,13 +3,13 @@ from typing import List, Dict
 
 class NewsService:
     """
-    Service responsible for fetching the latest financial news.
-    Utilizes the yfinance library to retrieve news headlines for specific stock tickers.
+    שירות האחראי על הבאת החדשות הפיננסיות העדכניות ביותר.
+    משתמש בספריית yfinance לשליפת כותרות חדשות עבור סמלי מניות ספציפיים.
     """
     def fetch_news(self, tickers: List[str]) -> Dict[str, List[str]]:
         """
-        Fetches the latest news headlines for the given tickers.
-        Returns a dictionary: { "AAPL": ["Headline 1", "Headline 2"], ... }
+        מושך את כותרות החדשות העדכניות ביותר עבור סמלי המניות הנתונים.
+        מחזיר מילון: { "AAPL": ["Headline 1", "Headline 2"], ... }
         """
         news_data = {}
         

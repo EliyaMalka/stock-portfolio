@@ -1,9 +1,9 @@
 """
-AI Chat Configuration Component.
+רכיב תצורת צ'אט AI.
 
-Displays a chat interface where the user can ask financial or portfolio questions.
-Communicates with the LangChain/LangGraph backend via a worker thread
-to ensure the UI remains responsive while the LLM generates answers.
+מציג ממשק צ'אט שבו המשתמש יכול לשאול שאלות פיננסיות או שאלות על תיק ההשקעות.
+מתקשר עם שרת LangChain/LangGraph דרך הליכון (thread) עבודה
+כדי להבטיח שממשק המשתמש יישאר רספונסיבי בזמן שה-LLM מייצר תשובות.
 """
 import sys
 from PySide6.QtWidgets import (
@@ -18,8 +18,8 @@ from model.chat_backend import get_chat_response
 
 class ChatWorker(QThread):
     """
-    QThread subclass to handle asynchronous fetching of AI responses.
-    Prevents the main GUI thread from freezing during network/LLM calls.
+    תת-מחלקה של QThread לטיפול בשליפה אסינכרונית של תשובות AI.
+    מונע הקפאה של הליכון ה-GUI הראשי במהלך קריאות רשת/LLM.
     """
     step_signal = Signal(str)
     result_signal = Signal(str)
@@ -29,7 +29,7 @@ class ChatWorker(QThread):
         self.question = question
 
     def run(self):
-        """Executes the backend LLM call and emits the resulting answers or errors."""
+        """מבצע את קריאת ה-LLM בשרת ופולט את התשובות או השגיאות המתקבלות."""
         try:
             self.step_signal.emit("Agent thinking...")
             answer = get_chat_response(self.question)
@@ -40,11 +40,11 @@ class ChatWorker(QThread):
 
 class ChatWindow(QWidget):
     """
-    Main widget for the AI Chat interface.
-    Manages input/output text display, styling, and the chat worker thread.
+    הווידג'ט הראשי עבור ממשק צ'אט ה-AI.
+    מנהל את תצוגת הקלט/פלט של טקסט, עיצוב (styling), והליכון (thread) העבודה של הצ'אט.
     """
     def __init__(self):
-        """Initializes the chat UI components and instance variables."""
+        """מאתחל את רכיבי ממשק המשתמש של הצ'אט ומשתני המופע."""
         super().__init__()
 
         self.load_stylesheet(r"view\chatWindow.qss")
@@ -72,7 +72,7 @@ class ChatWindow(QWidget):
         self.status_dot_timer = None
 
     def load_stylesheet(self, path):
-        """Loads and applies the QSS styling from the specified file."""
+        """טוען ומחיל את עיצוב ה-QSS מהקובץ שצוין."""
         file = QFile(path)
         if file.open(QFile.ReadOnly | QFile.Text):
             stream = QTextStream(file)
@@ -81,8 +81,8 @@ class ChatWindow(QWidget):
 
     def handle_user_input(self):
         """
-        Triggered when the user sends a message. 
-        Displays user message, disables input, and starts the background worker.
+        מופעל כאשר המשתמש שולח הודעה.
+        מציג את הודעת המשתמש, משבית את הקלט ומתחיל את הליכון הרקע.
         """
         question = self.input_line.text().strip()
         if not question:
@@ -99,7 +99,7 @@ class ChatWindow(QWidget):
         self.worker.start()
 
     def update_status_line(self, message):
-        """Initializes the 'thinking...' animation in the chat display."""
+        """מאתחל את האנימציה 'חושב...' (thinking...) בתצוגת הצ'אט."""
         self.status_base_text = message.strip(". ")
         self.status_dot_count = 0
 
@@ -113,7 +113,7 @@ class ChatWindow(QWidget):
         self.status_dot_timer.start(500)
 
     def append_or_update_status_line(self, text):
-        """Helper to append or replace the active status line text in the UI."""
+        """פעולת עזר להוספה או החלפה של טקסט שורת הסטטוס הפעילה בממשק המשתמש."""
         cursor = self.chat_display.textCursor()
         if self.last_status_position is None:
             self.chat_display.append(text)
@@ -126,20 +126,20 @@ class ChatWindow(QWidget):
             cursor.insertText(text)
 
     def animate_status_dots(self):
-        """Timer callback that modifies the status string with varying dot counts."""
+        """קריאה חוזרת (callback) של טיימר המשנה את מחרוזת הסטטוס עם מספר נקודות משתנה."""
         self.status_dot_count = (self.status_dot_count + 1) % 4
         dots = '.' * self.status_dot_count
         animated_text = f"{self.status_base_text}{dots}"
         self.append_or_update_status_line(animated_text)
 
     def set_transaction_window(self, transaction_window):
-        """Stores a reference to the main transaction window so it can be refreshed after trades."""
+        """שומר הפניה (reference) לחלון העסקאות הראשי כדי שניתן יהיה לרענן אותו לאחר עסקאות."""
         self.transaction_window = transaction_window
 
     def display_answer(self, answer):
         """
-        Receives the final answer from the worker, stops the animation, 
-        displays the AI response, and re-enables inputs.
+        מקבל את התשובה הסופית מהעובד (worker), עוצר את האנימציה,
+        מציג את תגובת ה-AI ומאפשר מחדש קלטים.
         """
         if self.status_dot_timer:
             self.status_dot_timer.stop()

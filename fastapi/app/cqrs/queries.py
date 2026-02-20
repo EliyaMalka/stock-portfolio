@@ -1,8 +1,8 @@
 """
-CQRS Queries.
+שאילתות CQRS.
 
-Data structures representing requests for information without mutating state.
-These are passed from routers to the CQRSHandler to fetch data.
+מבני נתונים המייצגים בקשות למידע ללא שינוי מצב.
+מועברים מהנתבים (routers) ל-CQRSHandler לשליפת נתונים.
 """
 from dataclasses import dataclass
 from typing import Optional

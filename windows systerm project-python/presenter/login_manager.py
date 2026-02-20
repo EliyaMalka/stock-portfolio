@@ -1,8 +1,8 @@
 """
-Login Presenter / Manager.
+מנהל/מציג (Presenter) של חלון ההתחברות.
 
-Handles the login UI logic, authenticates credentials against the FastAPI backend,
-and manages the transition from the login window to the main application window.
+מטפל בלוגיקת ממשק המשתמש של ההתחברות, מאמת הרשאות מול ה-API של FastAPI,
+ומנהל את המעבר מחלון ההתחברות לחלון היישום הראשי.
 """
 import hashlib  # For hashing the password for comparison
 import requests
@@ -13,14 +13,14 @@ import model.user
 
 
 def hash_password(password):
-    """Hash the password to match the hashedPassword format in the API."""
+    """מגבב את הסיסמה כדי שתתאים לפורמט ה-hashedPassword ב-API."""
     return hashlib.sha256(password.encode()).hexdigest()
 
 
 def check_credentials(username, password):
     """
-    Authenticates the user by sending a POST request to the backend login endpoint.
-    If successful, saves the user ID and username locally.
+    מאמת את המשתמש על ידי שליחת בקשת POST לנקודת הקצה של התחברות בשרת.
+    אם מצליח, שומר את מזהה המשתמש ושם המשתמש באופן מקומי.
     """
     try:
         # Prepare the login payload
@@ -53,11 +53,11 @@ def check_credentials(username, password):
 
 class LoginWindow(QMainWindow):
     """
-    The main login GUI class.
-    Handles user input, styles, and button connections.
+    מחלקת ממשק המשתמש הראשית של חלון ההתחברות.
+    מטפלת בקלט משתמש, סגנונות (styles) וחיבורי כפתורים.
     """
     def __init__(self, app):
-        """Initializes the UI components and connects the login button signal."""
+        """מאתחל את רכיבי ממשק המשתמש ומחבר את האות (signal) של כפתור ההתחברות."""
         super().__init__()
         self.app = app  # שמירת QApplication לניהול נכון של האירועים
         self.ui = Ui_MainWindow()
@@ -76,9 +76,9 @@ class LoginWindow(QMainWindow):
 
     def handle_login(self):
         """
-        Slot function triggered when the login button is clicked.
-        Validates credentials and manages window transition on success, 
-        or shows an error message on failure.
+        פונקציית חריץ (Slot) המופעלת בלחיצה על כפתור ההתחברות.
+        מאמתת הרשאות ומנהלת מעבר חלונות במקרה של הצלחה,
+        או מציגה הודעת שגיאה במקרה של כישלון.
         """
         username = self.ui.userName.text()
         password = self.ui.password.text()
@@ -93,7 +93,7 @@ class LoginWindow(QMainWindow):
             self.ui.wrongDetails.setVisible(True)  # Show the error message
 
     def show_main_window(self):
-        """Initializes and displays the main application window, applying its specific stylesheet first."""
+        """מאתחל ומציג את חלון היישום הראשי, תוך החלת גיליון הסגנונות (stylesheet) הספציפי שלו תחילה."""
         from PySide6.QtWidgets import QApplication
 
         # טעינת קובץ העיצוב
@@ -105,7 +105,7 @@ class LoginWindow(QMainWindow):
 
 
 def show_login_window(app):
-    """Helper function to instantiate and show the login window, then start the Qt event loop."""
+    """פונקציית עזר ליצירת מופע והצגת חלון ההתחברות, ולאחר מכן התחלת לולאת האירועים של Qt."""
     login_window = LoginWindow(app)
     login_window.show()
     app.exec()

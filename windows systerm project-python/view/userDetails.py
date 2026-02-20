@@ -1,9 +1,9 @@
 """
-User Details Dashboard Component.
+רכיב לוח בקרה לפרטי משתמש.
 
-Displays individual user information including username, email, balance,
-and currently owned stock holdings along with their net valuation over time.
-Provides interfaces for updating personal detail fields via the REST API.
+מציג מידע של משתמש פרטי כולל שם משתמש, אימייל, יתרה,
+והחזקות מניות נוכחיות בבעלותו יחד עם הערכת השווי נטו שלהן לאורך זמן.
+מספק ממשקים לעדכון שדות של פרטים אישיים באמצעות ה-REST API.
 """
 import sys
 import requests
@@ -19,15 +19,15 @@ from PySide6.QtWidgets import (
 
 class UserDetailsWindow(QMainWindow):
     """
-    Main widget class for the User Details tab window.
-    Handles data rendering of user profile constraints and current active holdings.
+    מחלקת הווידג'ט הראשית עבור חלון כרטיסיית פרטי המשתמש.
+    מטפלת ברינדור נתונים של אילוצי פרופיל משתמש והחזקות פעילות נוכחיות.
     """
     LABEL_WIDTH = 90
     BUTTON_WIDTH = 75
 
    
     def __init__(self, user_id, api_url, parent=None):
-        """Initializes the window with the current user ID and base API URL context."""
+        """מאתחל את החלון עם מזהה המשתמש הנוכחי והקשר ה-URL של ה-API הבסיסי."""
         super().__init__(parent)
         self.user_id = user_id
         self.api_url = api_url
@@ -38,7 +38,7 @@ class UserDetailsWindow(QMainWindow):
 
 
     def init_ui(self):
-        """Constructs and styles the layout widgets, input form, and portfolio table."""
+        """בונה ומעצב את ווידג'טי הפריסה, טופס הקלט וטבלת תיק ההשקעות (פורטפוליו)."""
         self.setWindowTitle("User Details")
         self.setGeometry(100, 100, 700, 600)  # Increased height for table
         self.load_stylesheet(r"view\userDetails.qss") # Adjust path if needed
@@ -96,7 +96,7 @@ class UserDetailsWindow(QMainWindow):
         # self.main_layout.addStretch(1) # Removed stretch to let table expand
 
     def create_separator(self):
-        """Creates a horizontal separator line used in UI structural layout."""
+        """יוצר קו מפריד אופקי המשמש בפריסה המבנית של ממשק המשתמש."""
         separator = QFrame()
         separator.setFrameShape(QFrame.HLine)
         separator.setFrameShadow(QFrame.Sunken)
@@ -104,7 +104,7 @@ class UserDetailsWindow(QMainWindow):
         return separator
 
     def load_stylesheet(self, path):
-        """Standard helper to apply styles dynamically from external QSS files."""
+        """פעולת עזר סטנדרטית להחלת סגנונות באופן דינמי מקובצי QSS חיצוניים."""
         file = QFile(path)
         if file.open(QFile.ReadOnly | QFile.Text):
             stream = QTextStream(file)
@@ -114,7 +114,7 @@ class UserDetailsWindow(QMainWindow):
             print(f"Warning: Could not load stylesheet from {path}")
 
     def create_input_field(self, parent_layout, label_text):
-        """Helper to create a read-only input field block alongside an Edit toggle button."""
+        """פעולת עזר ליצירת בלוק שדה קלט לקריאה בלבד (read-only) לצד כפתור מצב עריכה (Edit toggle)."""
         row_layout = QHBoxLayout()
         row_layout.setSpacing(10)
 
@@ -145,7 +145,7 @@ class UserDetailsWindow(QMainWindow):
         return input_field
 
     def create_balance_display(self, parent_layout):
-        """Helper to create the non-editable layout widget strictly for balance review."""
+        """פעולת עזר ליצירת ווידג'ט פריסה בלתי ניתן לעריכה אך ורק לסקירת יתרה."""
         row_layout = QHBoxLayout()
         row_layout.setSpacing(10)
 
@@ -169,7 +169,7 @@ class UserDetailsWindow(QMainWindow):
         return balance_value
 
     def toggle_edit(self, field, button):
-        """Slot toggling the readability property of input blocks if matched Edit calls."""
+        """חריץ (Slot) לשינוי תכונת הקריאות של בלוקי קלט אם מתאימות קריאות עריכה."""
         if field.isReadOnly():
             field.setReadOnly(False)
             field.setFocus()
@@ -194,7 +194,7 @@ class UserDetailsWindow(QMainWindow):
         button.style().polish(button)
         
     def load_user_details(self):
-        """Makes an asynchronous GET request to pull profile data from the REST backend."""
+        """מבצע בקשת GET אסינכרונית לשליפת נתוני פרופיל ממסד הנתונים/השרת."""
         try:
             response = requests.get(f"{self.api_url}/{self.user_id}")
             if response.status_code == 200:
@@ -214,7 +214,7 @@ class UserDetailsWindow(QMainWindow):
 
 
     def load_portfolio(self):
-        """Fetches related transactions and evaluates quantities owned into net values."""
+        """שולף עסקאות קשורות ומעריך כמויות בבעלות לערכי נטו (net values)."""
         try:
             response = requests.get(f"{self.api_url}/{self.user_id}/transactions")
             if response.status_code == 200:
@@ -259,7 +259,7 @@ class UserDetailsWindow(QMainWindow):
 
 
     def save_user_details(self):
-        """Verifies inputs and fires a PUT backend operation submitting property alterations."""
+        """מוודא קלטים ומפעיל פעולת PUT מול השרת לשליחת שינויי מאפיינים."""
         username_text = self.username.text().strip()
         email_text = self.email.text().strip()
 
@@ -299,7 +299,7 @@ class UserDetailsWindow(QMainWindow):
 
 
     def reset_edit_states(self):
-        """ Resets ALL editable fields to read-only and ensures their buttons say 'Edit'. """
+        """ מאפס את כל השדות הניתנים לעריכה ל'קריאה בלבד' (read-only) ומבטיח שהכפתורים שלהם מציגים 'Edit' ('ערוך'). """
         for item in self.editable_fields:
             field = item['field']
             button = item['button']

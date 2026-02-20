@@ -1,9 +1,9 @@
 """
-Main Entry Point for the Windows Stock Portfolio Application.
+נקודת הכניסה הראשית של אפליקציית ניהול תיק מניות ל-Windows.
 
-This script initializes the Qt Application and launches the initial view
-(the Login Window). It also sets up Windows-specific configurations 
-for taskbar icon rendering.
+סקריפט זה מאתחל את אפליקציית ה-Qt ומפעיל את התצוגה הראשונית
+(חלון ההתחברות). הוא גם מגדיר תצורות ספציפיות ל-Windows
+עבור רינדור סמל בשורת המשימות.
 """
 import sys
 from PySide6.QtWidgets import QApplication

@@ -1,9 +1,9 @@
 """
-API Router for User Management.
+נתב API עבור ניהול משתמשים.
 
-Provides endpoints for creating, authenticating, fetching, updating, 
-and deleting users, as well as managing their account balances.
-Routes commands and queries through the CQRS handler.
+מספק נקודות קצה ליצירה, אימות, שליפה, עדכון,
+ומחיקה של משתמשים, כמו גם ניהול יתרות החשבון שלהם.
+מנתב פקודות ושאילתות דרך מנהל ה-CQRS.
 """
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -17,15 +17,15 @@ from app.cqrs.handlers import CQRSHandler
 router = APIRouter()
 
 def get_handler(db: Session = Depends(get_db)) -> CQRSHandler:
-    """Dependency provider injecting the database session into the CQRSHandler."""
+    """ספק תלויות המזריק את סשן מסד הנתונים לתוך CQRSHandler."""
     return CQRSHandler(db)
 
 # User Endpoints
 @router.post("/users", response_model=schemas.UserRead, status_code=201)
 def create_user(user: schemas.UserCreate, handler: CQRSHandler = Depends(get_handler)):
     """
-    Registers a new user in the system.
-    Expects Username, Email, and Password. Creates a CreateUserCommand.
+    רושם משתמש חדש במערכת.
+    מצפה ל-Username, Email ו-Password. יוצר CreateUserCommand.
     """
     command = commands.CreateUserCommand(
         Username=user.Username, 
@@ -37,9 +37,9 @@ def create_user(user: schemas.UserCreate, handler: CQRSHandler = Depends(get_han
 @router.post("/login", response_model=schemas.UserRead, status_code=200)
 def login_user(user: schemas.UserLogin, handler: CQRSHandler = Depends(get_handler)):
     """
-    Authenticates a user.
-    Verifies the provided Username and Password against the stored hash.
-    Returns user details if successful.
+    מאמת משתמש.
+    מוודא את ה-Username וה-Password שסופקו מול הגיבוב (hash) השמור.
+    מחזיר פרטי משתמש במקרה של הצלחה.
     """
     command = commands.LoginUserCommand(
         Username=user.Username,
@@ -50,8 +50,8 @@ def login_user(user: schemas.UserLogin, handler: CQRSHandler = Depends(get_handl
 @router.get("/users", response_model=List[schemas.UserRead])
 def get_users(handler: CQRSHandler = Depends(get_handler)):
     """
-    Retrieves a list of all registered users.
-    Executes GetAllUsersQuery.
+    שולף רשימה של כל המשתמשים הרשומים.
+    מבצע GetAllUsersQuery.
     """
     query = queries.GetAllUsersQuery()
     return handler.handle_get_all_users(query)
@@ -59,8 +59,8 @@ def get_users(handler: CQRSHandler = Depends(get_handler)):
 @router.get("/users/{user_id}", response_model=schemas.UserRead)
 def get_user(user_id: int, handler: CQRSHandler = Depends(get_handler)):
     """
-    Retrieves a specific user's details by their ID.
-    Executes GetUserQuery.
+    שולף את הפרטים של משתמש ספציפי לפי ה-ID שלו.
+    מבצע GetUserQuery.
     """
     query = queries.GetUserQuery(UserID=user_id)
     return handler.handle_get_user(query)
@@ -68,8 +68,8 @@ def get_user(user_id: int, handler: CQRSHandler = Depends(get_handler)):
 @router.put("/users/{user_id}", response_model=schemas.UserRead)
 def update_user(user_id: int, user: schemas.UserUpdate, handler: CQRSHandler = Depends(get_handler)):
     """
-    Updates an existing user's Username and/or Email.
-    Executes UpdateUserCommand.
+    מעדכן את ה-Username ו/או ה-Email של משתמש קיים.
+    מבצע UpdateUserCommand.
     """
     command = commands.UpdateUserCommand(UserID=user_id, Username=user.Username, Email=user.Email)
     return handler.handle_update_user(command)
@@ -77,8 +77,8 @@ def update_user(user_id: int, user: schemas.UserUpdate, handler: CQRSHandler = D
 @router.delete("/users/{user_id}", status_code=204)
 def delete_user(user_id: int, handler: CQRSHandler = Depends(get_handler)):
     """
-    Deletes a user and their associated transactions from the database.
-    Executes DeleteUserCommand.
+    מוחק משתמש ואת העסקאות המשויכות אליו ממסד הנתונים.
+    מבצע DeleteUserCommand.
     """
     command = commands.DeleteUserCommand(UserID=user_id)
     handler.handle_delete_user(command)

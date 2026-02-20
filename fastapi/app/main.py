@@ -3,10 +3,10 @@ from app.config.database import engine, Base
 from app.api import endpoints
 
 """
-Main Entry Point for the FastAPI Application.
+נקודת הכניסה הראשית של אפליקציית FastAPI.
 
-This module initializes the FastAPI server, configures the API routes, 
-and sets up background tasks like the Sentiment Risk Monitor.
+מודול זה מאתחל את השרת, מגדיר את נתיבי ה-API,
+ומגדיר משימות רקע כמו ניטור סיכוני סנטימנט.
 """
 
 # Create tables if they don't exist (though they likely do)
@@ -33,9 +33,9 @@ from app.background.scheduler import BackgroundMonitor
 @app.on_event("startup")
 async def startup_event():
     """
-    Application startup event handler.
-    Responsible for initializing the database tables and launching asynchronous 
-    background tasks, such as the portfolio risk monitoring service.
+    מטפל באירוע הפעלת האפליקציה.
+    אחראי על אתחול טבלאות מסד הנתונים והפעלת משימות רקע אסינכרוניות,
+    כגון שירות ניטור סיכוני התיק.
     """
     # Ensure tables are created
     # In production, use migrations (Alembic). For dev, this is fine.
@@ -50,7 +50,7 @@ async def startup_event():
 @app.get("/")
 def read_root():
     """
-    Health check endpoint.
-    Returns a welcome message to confirm the API is running successfully.
+    נקודת קצה לבדיקת תקינות (Health check).
+    מחזירה הודעת ברוכים הבאים כדי לאשר שה-API פועל בהצלחה.
     """
     return {"message": "Welcome to Stock Project API"}

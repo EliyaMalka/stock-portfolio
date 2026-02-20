@@ -1,9 +1,9 @@
 """
-Transactions View Component.
+רכיב תצוגת עסקאות.
 
-Responsible for displaying the user's transaction history in a table,
-and providing interfaces (tabs) to execute new buy and sell orders.
-Interacts directly with the FastAPI backend to fetch limits and submit orders.
+אחראי על הצגת היסטוריית העסקאות של המשתמש בטבלה,
+ומספק ממשקים (כרטיסיות) לביצוע פקודות קנייה ומכירה חדשות.
+מקיים אינטראקציה ישירה עם ה-API של FastAPI לשליפת מגבלות והגשת פקודות.
 """
 import sys
 import os
@@ -33,11 +33,11 @@ except:
 
 class TransactionsWindow(QWidget):
     """
-    Main widget for the Transactions tab.
-    Contains the Buy/Sell tab widget and the transaction history table.
+    הווידג'ט הראשי עבור כרטיסיית העסקאות (Transactions).
+    מכיל את כרטיסיות הקנייה/מכירה ואת טבלת היסטוריית העסקאות.
     """
     def __init__(self):
-        """Initializes the UI, applies styling, and loads initial data."""
+        """מאתחל את ממשק המשתמש, מחיל עיצוב, וטוען נתונים ראשוניים."""
         super().__init__()
         self.setWindowTitle("User Transactions")
         self.setGeometry(100, 0, 700, 500)
@@ -76,7 +76,7 @@ class TransactionsWindow(QWidget):
 
 
     def apply_stylesheet(self):
-        """Loads and applies QSS styling for the transactions window."""
+        """טוען ומחיל עיצוב QSS עבור חלון העסקאות."""
         file = QFile(r"view\TransactionsWindow.qss")
         if file.open(QFile.ReadOnly | QFile.Text):
             stream = QTextStream(file)
@@ -84,7 +84,7 @@ class TransactionsWindow(QWidget):
             file.close()
 
     def setup_buy_tab(self):
-        """Configures the layout and inputs for the 'Buy Stock' tab."""
+        """מגדיר את הפריסה והקלטים עבור כרטיסיית 'קניית מניות' (Buy Stock)."""
         layout = QFormLayout()
         self.buy_stock_symbol = QComboBox()
         self.buy_stock_symbol.addItems(STOCK_SYMBOLS)
@@ -121,7 +121,7 @@ class TransactionsWindow(QWidget):
         self.buy_tab.setLayout(layout)
 
     def setup_sell_tab(self):
-        """Configures the layout and inputs for the 'Sell Stock' tab."""
+        """מגדיר את הפריסה והקלטים עבור כרטיסיית 'מכירת מניות' (Sell Stock)."""
         layout = QFormLayout()
         self.sell_stock_symbol = QComboBox()
         self.sell_stock_symbol.addItems(STOCK_SYMBOLS)
@@ -157,7 +157,7 @@ class TransactionsWindow(QWidget):
         self.sell_tab.setLayout(layout)
 
     def load_transactions(self):
-        """Fetches the current user's transaction history from the backend."""
+        """שולף את היסטוריית העסקאות של המשתמש הנוכחי ממסד הנתונים/השרת."""
         try:
             user_id = load_user_id()
             response = requests.get(f"{API_URL}/users/{user_id}/transactions")
@@ -171,7 +171,7 @@ class TransactionsWindow(QWidget):
 
 
     def populate_table(self, transactions):
-        """Populates the history QTableWidget with the fetched transactions data."""
+        """ממלא את טבלת ההיסטוריה (QTableWidget) בנתוני העסקאות שנשלפו."""
         sorted_transactions = sorted(transactions, key=lambda x: x["TransactionID"], reverse=True)
         self.table.setRowCount(len(sorted_transactions))
         self.table.setColumnCount(5)
@@ -213,7 +213,7 @@ class TransactionsWindow(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def create_readonly_item(self, text):
-        """Helper to create a standard, uneditable, center-aligned table cell."""
+        """פעולת עזר ליצירת תא טבלה תקני, לא ניתן לעריכה, ומיושר למרכז."""
         item = QTableWidgetItem(text)
         item.setFlags(item.flags() & ~Qt.ItemIsEditable)
         item.setTextAlignment(Qt.AlignCenter)
@@ -221,7 +221,7 @@ class TransactionsWindow(QWidget):
         return item
 
     def update_price(self, source="buy"):
-        """Fetches the latest current market price for the selected stock symbol via yfinance."""
+        """שולף את מחיר השוק העדכני ביותר עבור סמל המניה שנבחר באמצעות yfinance."""
         if source == "buy":
             stock = self.buy_stock_symbol.currentText()
             label = self.buy_price_label
@@ -258,8 +258,8 @@ class TransactionsWindow(QWidget):
 
     def buy_stock(self):
         """
-        Executes a buy order. 
-        Validates user balance against the total cost before submitting the transaction to the backend.
+        מבצע פקודת קנייה.
+        מוודא את יתרת המשתמש מול העלות הכוללת לפני שליחת העסקה לשרת.
         """
         user_id = load_user_id()
         
@@ -322,8 +322,8 @@ class TransactionsWindow(QWidget):
 
     def sell_stock(self):
         """
-        Executes a sell order.
-        Validates that the user holds enough shares of the selected stock before submitting the transaction.
+        מבצע פקודת מכירה.
+        מוודא שהמשתמש מחזיק במספיק מניות מהסוג הנבחר לפני שליחת העסקה.
         """
         user_id = load_user_id()
         stock_symbol = self.sell_stock_symbol.currentText()
@@ -363,7 +363,7 @@ class TransactionsWindow(QWidget):
             QMessageBox.critical(self, "Error", f"Request failed: {e}")
 
     def get_user_stock_quantity(self, user_id, stock_symbol):
-        """Helper to calculate the net quantity currently held for a specific stock symbol."""
+        """פעולת עזר לחישוב הכמות נטו המוחזקת כעת עבור סמל מניה ספציפי."""
         try:
             # Fetch user transactions directly
             response = requests.get(f"{API_URL}/users/{user_id}/transactions")
@@ -389,7 +389,7 @@ class TransactionsWindow(QWidget):
 
     
     def send_transaction(self, transaction_data, success_message):
-        """Helper to send the HTTP POST request for a transaction (buy or sell)."""
+        """פעולת עזר לשליחת צקשת HTTP POST עבור עסקה (קנייה או מכירה)."""
         try:
             response = requests.post(API_URL, json=transaction_data, headers={"Content-Type": "application/json"})
             if response.status_code == 201:

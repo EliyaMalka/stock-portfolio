@@ -1,8 +1,8 @@
 """
-API Router for Sentiment Analysis.
+נתב API עבור ניתוח סנטימנט.
 
-Provides on-demand endpoints to analyze the current market sentiment
-for specific stock symbols based on recent news headlines.
+מספק נקודות קצה לפי דרישה לניתוח סנטימנט השוק הנוכחי
+עבור סמלי מניות ספציפיים בהתבסס על כותרות חדשות אחרונות.
 """
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
@@ -17,11 +17,11 @@ news_service = NewsService()
 sentiment_service = SentimentService()
 
 class SentimentRequest(BaseModel):
-    """Schema for requesting a sentiment analysis."""
+    """סכימה עבור בקשת ניתוח סנטימנט."""
     symbol: str
 
 class SentimentResponse(BaseModel):
-    """Schema for the results of a sentiment analysis."""
+    """סכימה עבור תוצאות ניתוח סנטימנט."""
     symbol: str
     overall_sentiment: str # Positive, Negative, Neutral
     average_score: float
@@ -30,9 +30,9 @@ class SentimentResponse(BaseModel):
 @router.post("/sentiment/analyze", tags=["Sentiment"], response_model=SentimentResponse)
 def analyze_sentiment(request: SentimentRequest):
     """
-    Performs on-demand sentiment analysis for a specific stock.
-    Fetches the latest news headlines, calculates their sentiment scores,
-    and returns a summarized overall sentiment reading.
+    מבצע ניתוח סנטימנט לפי דרישה עבור מניה ספציפית.
+    מושך את כותרות החדשות העדכניות ביותר, מחשב את ציוני הסנטימנט שלהן,
+    ומחזיר קריאת סנטימנט כוללת מסוכמת.
     """
     symbol = request.symbol.upper()
     

@@ -1,8 +1,8 @@
 """
-CQRS Commands.
+פקודות CQRS.
 
-Data structures representing intent to mutate state (Create, Update, Delete).
-These are passed from routers to the CQRSHandler for execution.
+מבני נתונים המייצגים כוונה לשנות מצב (Create, Update, Delete).
+מועברים מהנתבים (routers) ל-CQRSHandler לביצוע.
 """
 from dataclasses import dataclass
 from decimal import Decimal

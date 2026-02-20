@@ -1,9 +1,9 @@
 """
-Stock Graph View Component.
+רכיב תצוגת גרף מניות.
 
-Responsible for rendering the interactive stock price chart using Matplotlib
-embedded within a PySide6 widget. Allows users to select a stock symbol
-and a time period (daily, weekly, yearly) to fetch and display historical data from Yahoo Finance.
+אחראי על רינדור תרשים מחירי המניות האינטראקטיבי באמצעות Matplotlib
+המוטמע בתוך ווידג'ט של PySide6. מאפשר למשתמשים לבחור סמל מניה
+ותקופת זמן (יומית, שבועית, שנתית) כדי לשלוף ולהציג נתונים היסטוריים מ-Yahoo Finance.
 """
 import sys
 import pandas as pd
@@ -19,10 +19,10 @@ import matplotlib.dates as mdates
 
 class StockGraph(QWidget):
     """
-    Widget containing the stock selection controls and the Matplotlib canvas.
+    ווידג'ט המכיל את בקרי בחירת המניות ואת לוח הציור (canvas) של Matplotlib.
     """
     def __init__(self):
-        """Initializes the UI, default selections, timezone cache workaround, and starts the auto-refresh timer."""
+        """מאתחל את ממשק המשתמש, בחירות ברירת המחדל, מעקף למטמון אזור הזמן, ומתחיל את טיימר הרענון האוטומטי."""
         super().__init__()
         self.symbol = "NVDA"
         self.period = "1y"
@@ -41,7 +41,7 @@ class StockGraph(QWidget):
         self.update_graph()
 
     def initUI(self):
-        """Builds the layouts, combo boxes, radio buttons, and the Matplotlib canvas."""
+        """בונה את הפריסות (layouts), תיבות הבחירה (combo boxes), כפתורי הרדיו, ולוח הציור של Matplotlib."""
         layout = QVBoxLayout()
         top_layout = QHBoxLayout()
         top_layout.setSpacing(20)  # ריווח בין שתי הקבוצות (Stock ו-Period)
@@ -109,7 +109,7 @@ class StockGraph(QWidget):
 
 
     def load_stylesheet(self, path):
-        """Loads and applies the QSS styling for the widget."""
+        """טוען ומחיל את העיצוב (QSS styling) עבור הווידג'ט."""
         file = QFile(path)
         if file.open(QFile.ReadOnly | QFile.Text):
             stream = QTextStream(file)
@@ -117,17 +117,17 @@ class StockGraph(QWidget):
             file.close()
             
     def update_symbol(self, text):
-        """Slot to handle stock symbol change and trigger a graph update."""
+        """חריץ (Slot) לטיפול בשינוי סמל מניה והפעלת עדכון גרף."""
         self.symbol = text
         self.update_graph()
 
     def update_period(self, period):
-        """Slot to handle time period change and trigger a graph update."""
+        """חריץ (Slot) לטיפול בשינוי תקופת זמן והפעלת עדכון גרף."""
         self.period = period
         self.update_graph()
 
     def fetch_stock_data(self):
-        """Fetches historical stock data from Yahoo Finance based on current selections."""
+        """שולף נתוני מניות היסטוריים מ-Yahoo Finance בהתבסס על הבחירות הנוכחיות."""
         try:
             print(f"Fetching data for {self.symbol} ({self.period})...")
             interval = "1d" if self.period == "1y" else "1h"
@@ -148,7 +148,7 @@ class StockGraph(QWidget):
             return None
 
     def update_graph(self):
-        """Fetches new data, clears the old plot, and renders the new plot with proper formatting."""
+        """שולף נתונים חדשים, מנקה את התרשים הישן, ומרנדר את התרשים החדש עם עיצוב מתאים."""
         data = self.fetch_stock_data()
         if data is not None and not data.empty:
             self.ax.clear()

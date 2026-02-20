@@ -5,17 +5,17 @@ from app.config.database import SessionLocal
 
 class PortfolioService:
     """
-    Service responsible for aggregating and analyzing user portfolio data.
-    Provides methods to determine which stocks are currently actively held by users.
+    שירות האחראי על איסוף וניתוח נתוני התיק של המשתמשים.
+    מספק שיטות לקבוע אילו מניות מוחזקות כעת באופן פעיל על ידי משתמשים.
     """
     def __init__(self, db: Session):
         self.db = db
 
     def get_active_holdings(self, user_id: int) -> List[str]:
         """
-        Calculates the current net quantity of stocks owned by a specific user.
-        Aggregates all buy/sell transactions to find the current balance.
-        Returns a list of ticker symbols where the net quantity is > 0.
+        מחשב את הכמות נטו הנוכחית של מניות בבעלות משתמש ספציפי.
+        מסכם את כל עסקאות הקנייה/מכירה כדי למצוא את היתרה הנוכחית.
+        מחזיר רשימה של סמלי מניות שבהם הכמות נטו גדולה מ-0.
         """
         query = text("SELECT StockSymbol, Quantity FROM Transactions WHERE UserID = :user_id")
         result = self.db.execute(query, {"user_id": user_id}).fetchall()
@@ -37,10 +37,10 @@ class PortfolioService:
 
     def get_all_active_stocks(self) -> List[str]:
         """
-        Analyzes transactions across all users to find every unique stock 
-        currently held by at least one user (net quantity > 0).
-        Used by the background monitor to know which stocks to track.
-        Returns a list of unique ticker symbols.
+        מנתח עסקאות של כל המשתמשים כדי למצוא כל מניה ייחודית
+        המוחזקת כעת על ידי משתמש אחד לפחות (כמות נטו גדולה מ-0).
+        משמש את מנטר הרקע כדי לדעת אילו מניות לעקוב אחריהן.
+        מחזיר רשימה של סמלי מניות ייחודיים.
         """
         # Fetch all transactions
         query = text("SELECT UserID, StockSymbol, Quantity FROM Transactions")
