@@ -1,3 +1,9 @@
+"""
+API Router for Sentiment Analysis.
+
+Provides on-demand endpoints to analyze the current market sentiment
+for specific stock symbols based on recent news headlines.
+"""
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Optional
@@ -11,9 +17,11 @@ news_service = NewsService()
 sentiment_service = SentimentService()
 
 class SentimentRequest(BaseModel):
+    """Schema for requesting a sentiment analysis."""
     symbol: str
 
 class SentimentResponse(BaseModel):
+    """Schema for the results of a sentiment analysis."""
     symbol: str
     overall_sentiment: str # Positive, Negative, Neutral
     average_score: float
@@ -22,8 +30,9 @@ class SentimentResponse(BaseModel):
 @router.post("/sentiment/analyze", tags=["Sentiment"], response_model=SentimentResponse)
 def analyze_sentiment(request: SentimentRequest):
     """
-    On-demand sentiment analysis for a specific stock.
-    Fetches latest news, analyzes sentiment, and returns a summary.
+    Performs on-demand sentiment analysis for a specific stock.
+    Fetches the latest news headlines, calculates their sentiment scores,
+    and returns a summarized overall sentiment reading.
     """
     symbol = request.symbol.upper()
     
@@ -69,3 +78,4 @@ def analyze_sentiment(request: SentimentRequest):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+

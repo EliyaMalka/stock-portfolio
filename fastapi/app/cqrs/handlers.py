@@ -1,3 +1,10 @@
+"""
+CQRS Handlers.
+
+Contains the CQRSHandler class which encapsulates business logic 
+and database interactions. It processes incoming Commands (to mutate state) 
+and Queries (to read state).
+"""
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
@@ -6,11 +13,16 @@ from app.cqrs import commands, queries
 from typing import List
 
 class CQRSHandler:
+    """
+    Handles execution of CQRS Commands and Queries.
+    Acts as the intermediary between the API routers and the database models.
+    """
     def __init__(self, db: Session):
         self.db = db
 
     # Command Handlers
     def handle_create_user(self, command: commands.CreateUserCommand) -> models.User:
+        """Handles creating a new user, hashing their password securely using argon2."""
         try:
             from passlib.context import CryptContext
             # Switching to argon2 to avoid 72 byte limit of bcrypt and for better security
@@ -42,6 +54,7 @@ class CQRSHandler:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     def handle_login(self, command: commands.LoginUserCommand) -> models.User:
+        """Handles user authentication by verifying the provided password against the stored hash."""
         db_user = self.db.query(models.User).filter(models.User.Username == command.Username).first()
         if not db_user:
              raise HTTPException(status_code=401, detail="Invalid username or password")
@@ -58,6 +71,7 @@ class CQRSHandler:
         return db_user
 
     def handle_update_user(self, command: commands.UpdateUserCommand) -> models.User:
+        """Handles updating existing user profile information (Username, Email)."""
         db_user = self.db.query(models.User).filter(models.User.UserID == command.UserID).first()
         if not db_user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -74,6 +88,7 @@ class CQRSHandler:
             raise HTTPException(status_code=400, detail="Username or Email already exists")
 
     def handle_delete_user(self, command: commands.DeleteUserCommand):
+        """Handles deleting a user from the system."""
         db_user = self.db.query(models.User).filter(models.User.UserID == command.UserID).first()
         if not db_user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -83,6 +98,10 @@ class CQRSHandler:
         return {"detail": "User deleted successfully"}
 
     def handle_create_transaction(self, command: commands.CreateTransactionCommand) -> models.Transaction:
+        """
+        Handles recording a stock transaction and updating the user's cash balance accordingly.
+        Enforces logic like insufficient funds or insufficient stock holdings.
+        """
         user = self.db.query(models.User).filter(models.User.UserID == command.UserID).first()
         if not user:
              raise HTTPException(status_code=404, detail="User not found")
@@ -131,19 +150,24 @@ class CQRSHandler:
 
     # Query Handlers
     def handle_get_user(self, query: queries.GetUserQuery) -> models.User:
+        """Retrieves a single user's details."""
         user = self.db.query(models.User).filter(models.User.UserID == query.UserID).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         return user
 
     def handle_get_all_users(self, query: queries.GetAllUsersQuery) -> List[models.User]:
+        """Retrieves all users."""
         return self.db.query(models.User).all()
 
     def handle_get_transaction(self, query: queries.GetTransactionQuery) -> models.Transaction:
+        """Retrieves details of a specific transaction."""
         transaction = self.db.query(models.Transaction).filter(models.Transaction.TransactionID == query.TransactionID).first()
         if not transaction:
              raise HTTPException(status_code=404, detail="Transaction not found")
         return transaction
     
     def handle_get_user_transactions(self, query: queries.GetUserTransactionsQuery) -> List[models.Transaction]:
+        """Retrieves all transactions belonging to a specific user."""
         return self.db.query(models.Transaction).filter(models.Transaction.UserID == query.UserID).all()
+

@@ -2,6 +2,10 @@ import yfinance as yf
 from typing import List, Dict
 
 class NewsService:
+    """
+    Service responsible for fetching the latest financial news.
+    Utilizes the yfinance library to retrieve news headlines for specific stock tickers.
+    """
     def fetch_news(self, tickers: List[str]) -> Dict[str, List[str]]:
         """
         Fetches the latest news headlines for the given tickers.

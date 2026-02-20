@@ -1,3 +1,10 @@
+"""
+AI Chat Configuration Component.
+
+Displays a chat interface where the user can ask financial or portfolio questions.
+Communicates with the LangChain/LangGraph backend via a worker thread
+to ensure the UI remains responsive while the LLM generates answers.
+"""
 import sys
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QTextEdit,
@@ -10,6 +17,10 @@ from model.chat_backend import get_chat_response
 
 
 class ChatWorker(QThread):
+    """
+    QThread subclass to handle asynchronous fetching of AI responses.
+    Prevents the main GUI thread from freezing during network/LLM calls.
+    """
     step_signal = Signal(str)
     result_signal = Signal(str)
 
@@ -18,6 +29,7 @@ class ChatWorker(QThread):
         self.question = question
 
     def run(self):
+        """Executes the backend LLM call and emits the resulting answers or errors."""
         try:
             self.step_signal.emit("Agent thinking...")
             answer = get_chat_response(self.question)
@@ -27,7 +39,12 @@ class ChatWorker(QThread):
 
 
 class ChatWindow(QWidget):
+    """
+    Main widget for the AI Chat interface.
+    Manages input/output text display, styling, and the chat worker thread.
+    """
     def __init__(self):
+        """Initializes the chat UI components and instance variables."""
         super().__init__()
 
         self.load_stylesheet(r"view\chatWindow.qss")
@@ -55,6 +72,7 @@ class ChatWindow(QWidget):
         self.status_dot_timer = None
 
     def load_stylesheet(self, path):
+        """Loads and applies the QSS styling from the specified file."""
         file = QFile(path)
         if file.open(QFile.ReadOnly | QFile.Text):
             stream = QTextStream(file)
@@ -62,6 +80,10 @@ class ChatWindow(QWidget):
             file.close()
 
     def handle_user_input(self):
+        """
+        Triggered when the user sends a message. 
+        Displays user message, disables input, and starts the background worker.
+        """
         question = self.input_line.text().strip()
         if not question:
             return
@@ -77,6 +99,7 @@ class ChatWindow(QWidget):
         self.worker.start()
 
     def update_status_line(self, message):
+        """Initializes the 'thinking...' animation in the chat display."""
         self.status_base_text = message.strip(". ")
         self.status_dot_count = 0
 
@@ -90,6 +113,7 @@ class ChatWindow(QWidget):
         self.status_dot_timer.start(500)
 
     def append_or_update_status_line(self, text):
+        """Helper to append or replace the active status line text in the UI."""
         cursor = self.chat_display.textCursor()
         if self.last_status_position is None:
             self.chat_display.append(text)
@@ -102,15 +126,21 @@ class ChatWindow(QWidget):
             cursor.insertText(text)
 
     def animate_status_dots(self):
+        """Timer callback that modifies the status string with varying dot counts."""
         self.status_dot_count = (self.status_dot_count + 1) % 4
         dots = '.' * self.status_dot_count
         animated_text = f"{self.status_base_text}{dots}"
         self.append_or_update_status_line(animated_text)
 
     def set_transaction_window(self, transaction_window):
+        """Stores a reference to the main transaction window so it can be refreshed after trades."""
         self.transaction_window = transaction_window
 
     def display_answer(self, answer):
+        """
+        Receives the final answer from the worker, stops the animation, 
+        displays the AI response, and re-enables inputs.
+        """
         if self.status_dot_timer:
             self.status_dot_timer.stop()
             self.status_dot_timer = None
@@ -138,3 +168,4 @@ if __name__ == "__main__":
     window = ChatWindow()
     window.show()
     sys.exit(app.exec())
+

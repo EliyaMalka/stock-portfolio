@@ -1,3 +1,9 @@
+"""
+User Configuration Model.
+
+Manages storing and retrieving the currently logged-in user's information
+(like Username and UserID) to/from a local JSON file.
+"""
 import json
 import os
 
@@ -33,6 +39,7 @@ def load_user_id():
 # --- פונקציות עזר פרטיות ---
 
 def _load_user_data():
+    """Reads the user JSON file and returns its contents as a dictionary. Returns empty dict if not found."""
     try:
         with open(USER_FILE, "r") as f:
             return json.load(f)
@@ -41,6 +48,7 @@ def _load_user_data():
 
 
 def _save_user_data(data):
+    """Writes the given dictionary to the user JSON file."""
     os.makedirs(os.path.dirname(USER_FILE), exist_ok=True)
     with open(USER_FILE, "w") as f:
         json.dump(data, f, indent=4)
@@ -52,3 +60,4 @@ if __name__ == "__main__":
     save_user_id(4)
     print("Loaded username:", load_username())
     print("Loaded userID:", load_user_id())
+

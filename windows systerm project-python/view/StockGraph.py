@@ -1,7 +1,15 @@
+"""
+Stock Graph View Component.
+
+Responsible for rendering the interactive stock price chart using Matplotlib
+embedded within a PySide6 widget. Allows users to select a stock symbol
+and a time period (daily, weekly, yearly) to fetch and display historical data from Yahoo Finance.
+"""
 import sys
 import pandas as pd
 import os
 import yfinance as yf
+import matplotlib.subplots as subplots
 import matplotlib.pyplot as plt
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QWidget, 
                                QComboBox, QRadioButton, QHBoxLayout, QLabel)
@@ -10,7 +18,11 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.dates as mdates
 
 class StockGraph(QWidget):
+    """
+    Widget containing the stock selection controls and the Matplotlib canvas.
+    """
     def __init__(self):
+        """Initializes the UI, default selections, timezone cache workaround, and starts the auto-refresh timer."""
         super().__init__()
         self.symbol = "NVDA"
         self.period = "1y"
@@ -29,11 +41,12 @@ class StockGraph(QWidget):
         self.update_graph()
 
     def initUI(self):
+        """Builds the layouts, combo boxes, radio buttons, and the Matplotlib canvas."""
         layout = QVBoxLayout()
         top_layout = QHBoxLayout()
         top_layout.setSpacing(20)  # ריווח בין שתי הקבוצות (Stock ו-Period)
 
-        # --- Stock ---
+        # --- Stock Selection ---
         stock_container = QWidget()
         stock_layout = QHBoxLayout()
         stock_layout.setContentsMargins(0, 0, 0, 0)
@@ -51,7 +64,7 @@ class StockGraph(QWidget):
         stock_layout.addWidget(stock_label)
         stock_layout.addWidget(self.stock_selector)
 
-        # --- Period ---
+        # --- Period Selection ---
         period_container = QWidget()
         period_layout = QHBoxLayout()
         period_layout.setContentsMargins(0, 0, 0, 0)
@@ -80,7 +93,7 @@ class StockGraph(QWidget):
         top_layout.addWidget(period_container)
         top_layout.addStretch(1)
 
-        # גרף
+        # Matplotlib Graph Setup
         self.figure, self.ax = plt.subplots()
         self.canvas = FigureCanvas(self.figure)
 
@@ -92,11 +105,11 @@ class StockGraph(QWidget):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_graph)
-        self.timer.start(300000)
-
+        self.timer.start(300000) # Auto-refresh every 5 minutes
 
 
     def load_stylesheet(self, path):
+        """Loads and applies the QSS styling for the widget."""
         file = QFile(path)
         if file.open(QFile.ReadOnly | QFile.Text):
             stream = QTextStream(file)
@@ -104,14 +117,17 @@ class StockGraph(QWidget):
             file.close()
             
     def update_symbol(self, text):
+        """Slot to handle stock symbol change and trigger a graph update."""
         self.symbol = text
         self.update_graph()
 
     def update_period(self, period):
+        """Slot to handle time period change and trigger a graph update."""
         self.period = period
         self.update_graph()
 
     def fetch_stock_data(self):
+        """Fetches historical stock data from Yahoo Finance based on current selections."""
         try:
             print(f"Fetching data for {self.symbol} ({self.period})...")
             interval = "1d" if self.period == "1y" else "1h"
@@ -132,6 +148,7 @@ class StockGraph(QWidget):
             return None
 
     def update_graph(self):
+        """Fetches new data, clears the old plot, and renders the new plot with proper formatting."""
         data = self.fetch_stock_data()
         if data is not None and not data.empty:
             self.ax.clear()
@@ -178,3 +195,4 @@ class StockGraph(QWidget):
 
             self.ax.grid(True, linestyle='--', alpha=0.6)
             self.canvas.draw()
+

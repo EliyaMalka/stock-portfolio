@@ -1,3 +1,10 @@
+"""
+Transactions View Component.
+
+Responsible for displaying the user's transaction history in a table,
+and providing interfaces (tabs) to execute new buy and sell orders.
+Interacts directly with the FastAPI backend to fetch limits and submit orders.
+"""
 import sys
 import os
 import requests
@@ -25,7 +32,12 @@ except:
 
 
 class TransactionsWindow(QWidget):
+    """
+    Main widget for the Transactions tab.
+    Contains the Buy/Sell tab widget and the transaction history table.
+    """
     def __init__(self):
+        """Initializes the UI, applies styling, and loads initial data."""
         super().__init__()
         self.setWindowTitle("User Transactions")
         self.setGeometry(100, 0, 700, 500)
@@ -37,17 +49,11 @@ class TransactionsWindow(QWidget):
         self.current_buy_price = 0
         self.current_sell_price = 0
 
-
-        # self.label = QLabel("User Transactions")
-        # self.label.setObjectName("mainLabel")
-        # self.label.setAlignment(Qt.AlignCenter)
-        # layout.addWidget(self.label)
-
         self.tabs = QTabWidget()
         self.buy_tab = QWidget()
         self.sell_tab = QWidget()
-        self.buy_tab.setObjectName("buyTab")  # שם ייחודי לטאב Buy Stock
-        self.sell_tab.setObjectName("sellTab")  # שם ייחודי לטאב Sell Stock
+        self.buy_tab.setObjectName("buyTab")  # Unique name for Buy Stock tab
+        self.sell_tab.setObjectName("sellTab")  # Unique name for Sell Stock tab
         self.tabs.addTab(self.buy_tab, "Buy Stock")
         self.tabs.addTab(self.sell_tab, "Sell Stock")
 
@@ -56,11 +62,11 @@ class TransactionsWindow(QWidget):
         layout.addWidget(self.tabs)
 
         self.table = QTableWidget()
-        self.table.verticalHeader().setVisible(False)  # ביטול המספרים של השורות
-        self.table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # התאמת גודל הטבלה
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # התאמת עמודות לרוחב הטבלה
+        self.table.verticalHeader().setVisible(False)  # Disable row numbers
+        self.table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Size adjustment
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # Stretch columns to fit
         layout.addWidget(self.table)
-        layout.setStretch(1, 1)  # הגדרת Stretch לטבלה
+        layout.setStretch(1, 1)  # Set Stretch for the table
 
         self.setLayout(layout)
 
@@ -70,9 +76,7 @@ class TransactionsWindow(QWidget):
 
 
     def apply_stylesheet(self):
-        import os
-        # הדפסת הנתיב הנוכחי
-        print("Current working directory:", os.getcwd())
+        """Loads and applies QSS styling for the transactions window."""
         file = QFile(r"view\TransactionsWindow.qss")
         if file.open(QFile.ReadOnly | QFile.Text):
             stream = QTextStream(file)
@@ -80,6 +84,7 @@ class TransactionsWindow(QWidget):
             file.close()
 
     def setup_buy_tab(self):
+        """Configures the layout and inputs for the 'Buy Stock' tab."""
         layout = QFormLayout()
         self.buy_stock_symbol = QComboBox()
         self.buy_stock_symbol.addItems(STOCK_SYMBOLS)
@@ -116,6 +121,7 @@ class TransactionsWindow(QWidget):
         self.buy_tab.setLayout(layout)
 
     def setup_sell_tab(self):
+        """Configures the layout and inputs for the 'Sell Stock' tab."""
         layout = QFormLayout()
         self.sell_stock_symbol = QComboBox()
         self.sell_stock_symbol.addItems(STOCK_SYMBOLS)
@@ -151,6 +157,7 @@ class TransactionsWindow(QWidget):
         self.sell_tab.setLayout(layout)
 
     def load_transactions(self):
+        """Fetches the current user's transaction history from the backend."""
         try:
             user_id = load_user_id()
             response = requests.get(f"{API_URL}/users/{user_id}/transactions")
@@ -159,14 +166,12 @@ class TransactionsWindow(QWidget):
                 self.populate_table(transactions)
             else:
                 layout = self.layout()
-                # self.label.setText("Failed to load transactions") # Label commented out in init
         except requests.exceptions.RequestException as e:
-            pass # self.label.setText(f"Error: {e}")
+            pass 
 
 
     def populate_table(self, transactions):
-        # user_id = load_user_id() 
-        # filtered_transactions = [t for t in transactions if t["userID"] == user_id]  # Fetching by user now
+        """Populates the history QTableWidget with the fetched transactions data."""
         sorted_transactions = sorted(transactions, key=lambda x: x["TransactionID"], reverse=True)
         self.table.setRowCount(len(sorted_transactions))
         self.table.setColumnCount(5)
@@ -191,16 +196,16 @@ class TransactionsWindow(QWidget):
             price_item = self.create_readonly_item(str(transaction["PricePerStock"]))
             self.table.setItem(row, 4, price_item)
 
-            # Set background color for the entire row
-            if transaction["Quantity"] > 0:  # ערך חיובי
-                background_color = QColor("#e8f5e9")  # ירוק בהיר
-            elif transaction["Quantity"] < 0:  # ערך שלילי
-                background_color = QColor("#ffebee")  # אדום בהיר
+            # Set background color for the entire row based on buy/sell
+            if transaction["Quantity"] > 0:  # Positive value (Buy)
+                background_color = QColor("#e8f5e9")  # Light green
+            elif transaction["Quantity"] < 0:  # Negative value (Sell)
+                background_color = QColor("#ffebee")  # Light red
             else:
-                background_color = QColor("#ffffff")  # לבן (ברירת מחדל)
+                background_color = QColor("#ffffff")  # White (Default)
 
             # Apply the background color to all cells in the row
-            for column in range(5):  # מספר העמודות בטבלה
+            for column in range(5):
                 self.table.item(row, column).setBackground(background_color)
 
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -208,13 +213,15 @@ class TransactionsWindow(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def create_readonly_item(self, text):
+        """Helper to create a standard, uneditable, center-aligned table cell."""
         item = QTableWidgetItem(text)
         item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-        item.setTextAlignment(Qt.AlignCenter)  # יישור הטקסט למרכז
+        item.setTextAlignment(Qt.AlignCenter)
 
         return item
 
     def update_price(self, source="buy"):
+        """Fetches the latest current market price for the selected stock symbol via yfinance."""
         if source == "buy":
             stock = self.buy_stock_symbol.currentText()
             label = self.buy_price_label
@@ -250,6 +257,10 @@ class TransactionsWindow(QWidget):
 
 
     def buy_stock(self):
+        """
+        Executes a buy order. 
+        Validates user balance against the total cost before submitting the transaction to the backend.
+        """
         user_id = load_user_id()
         
         # Fetch user details to get the balance
@@ -310,11 +321,15 @@ class TransactionsWindow(QWidget):
             QMessageBox.critical(self, "Error", f"Request failed: {e}")
 
     def sell_stock(self):
+        """
+        Executes a sell order.
+        Validates that the user holds enough shares of the selected stock before submitting the transaction.
+        """
         user_id = load_user_id()
         stock_symbol = self.sell_stock_symbol.currentText()
         sell_quantity = self.sell_quantity.value()
 
-        # בדוק אם למשתמש יש מספיק מניות
+        # Check if user has enough shares
         user_stock_quantity = self.get_user_stock_quantity(user_id, stock_symbol)
         if user_stock_quantity < sell_quantity:
             QMessageBox.warning(self, "Error", 
@@ -348,6 +363,7 @@ class TransactionsWindow(QWidget):
             QMessageBox.critical(self, "Error", f"Request failed: {e}")
 
     def get_user_stock_quantity(self, user_id, stock_symbol):
+        """Helper to calculate the net quantity currently held for a specific stock symbol."""
         try:
             # Fetch user transactions directly
             response = requests.get(f"{API_URL}/users/{user_id}/transactions")
@@ -373,6 +389,7 @@ class TransactionsWindow(QWidget):
 
     
     def send_transaction(self, transaction_data, success_message):
+        """Helper to send the HTTP POST request for a transaction (buy or sell)."""
         try:
             response = requests.post(API_URL, json=transaction_data, headers={"Content-Type": "application/json"})
             if response.status_code == 201:
@@ -388,3 +405,4 @@ if __name__ == "__main__":
     window = TransactionsWindow()
     window.show()
     sys.exit(app.exec())
+

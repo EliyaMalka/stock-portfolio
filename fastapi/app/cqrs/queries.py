@@ -1,3 +1,9 @@
+"""
+CQRS Queries.
+
+Data structures representing requests for information without mutating state.
+These are passed from routers to the CQRSHandler to fetch data.
+"""
 from dataclasses import dataclass
 from typing import Optional
 
@@ -16,3 +22,4 @@ class GetTransactionQuery:
 @dataclass
 class GetUserTransactionsQuery:
     UserID: int
+

@@ -1,3 +1,10 @@
+"""
+API Router for User Management.
+
+Provides endpoints for creating, authenticating, fetching, updating, 
+and deleting users, as well as managing their account balances.
+Routes commands and queries through the CQRS handler.
+"""
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -10,11 +17,16 @@ from app.cqrs.handlers import CQRSHandler
 router = APIRouter()
 
 def get_handler(db: Session = Depends(get_db)) -> CQRSHandler:
+    """Dependency provider injecting the database session into the CQRSHandler."""
     return CQRSHandler(db)
 
 # User Endpoints
 @router.post("/users", response_model=schemas.UserRead, status_code=201)
 def create_user(user: schemas.UserCreate, handler: CQRSHandler = Depends(get_handler)):
+    """
+    Registers a new user in the system.
+    Expects Username, Email, and Password. Creates a CreateUserCommand.
+    """
     command = commands.CreateUserCommand(
         Username=user.Username, 
         Email=user.Email,
@@ -24,6 +36,11 @@ def create_user(user: schemas.UserCreate, handler: CQRSHandler = Depends(get_han
 
 @router.post("/login", response_model=schemas.UserRead, status_code=200)
 def login_user(user: schemas.UserLogin, handler: CQRSHandler = Depends(get_handler)):
+    """
+    Authenticates a user.
+    Verifies the provided Username and Password against the stored hash.
+    Returns user details if successful.
+    """
     command = commands.LoginUserCommand(
         Username=user.Username,
         Password=user.Password
@@ -32,21 +49,37 @@ def login_user(user: schemas.UserLogin, handler: CQRSHandler = Depends(get_handl
 
 @router.get("/users", response_model=List[schemas.UserRead])
 def get_users(handler: CQRSHandler = Depends(get_handler)):
+    """
+    Retrieves a list of all registered users.
+    Executes GetAllUsersQuery.
+    """
     query = queries.GetAllUsersQuery()
     return handler.handle_get_all_users(query)
 
 @router.get("/users/{user_id}", response_model=schemas.UserRead)
 def get_user(user_id: int, handler: CQRSHandler = Depends(get_handler)):
+    """
+    Retrieves a specific user's details by their ID.
+    Executes GetUserQuery.
+    """
     query = queries.GetUserQuery(UserID=user_id)
     return handler.handle_get_user(query)
 
 @router.put("/users/{user_id}", response_model=schemas.UserRead)
 def update_user(user_id: int, user: schemas.UserUpdate, handler: CQRSHandler = Depends(get_handler)):
+    """
+    Updates an existing user's Username and/or Email.
+    Executes UpdateUserCommand.
+    """
     command = commands.UpdateUserCommand(UserID=user_id, Username=user.Username, Email=user.Email)
     return handler.handle_update_user(command)
 
 @router.delete("/users/{user_id}", status_code=204)
 def delete_user(user_id: int, handler: CQRSHandler = Depends(get_handler)):
+    """
+    Deletes a user and their associated transactions from the database.
+    Executes DeleteUserCommand.
+    """
     command = commands.DeleteUserCommand(UserID=user_id)
     handler.handle_delete_user(command)
     return

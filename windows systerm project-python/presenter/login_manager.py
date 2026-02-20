@@ -1,3 +1,9 @@
+"""
+Login Presenter / Manager.
+
+Handles the login UI logic, authenticates credentials against the FastAPI backend,
+and manages the transition from the login window to the main application window.
+"""
 import hashlib  # For hashing the password for comparison
 import requests
 from PySide6.QtWidgets import QMainWindow, QMessageBox
@@ -12,6 +18,10 @@ def hash_password(password):
 
 
 def check_credentials(username, password):
+    """
+    Authenticates the user by sending a POST request to the backend login endpoint.
+    If successful, saves the user ID and username locally.
+    """
     try:
         # Prepare the login payload
         payload = {
@@ -42,7 +52,12 @@ def check_credentials(username, password):
 
 
 class LoginWindow(QMainWindow):
+    """
+    The main login GUI class.
+    Handles user input, styles, and button connections.
+    """
     def __init__(self, app):
+        """Initializes the UI components and connects the login button signal."""
         super().__init__()
         self.app = app  # שמירת QApplication לניהול נכון של האירועים
         self.ui = Ui_MainWindow()
@@ -60,6 +75,11 @@ class LoginWindow(QMainWindow):
             self.setStyleSheet(style_file.read())
 
     def handle_login(self):
+        """
+        Slot function triggered when the login button is clicked.
+        Validates credentials and manages window transition on success, 
+        or shows an error message on failure.
+        """
         username = self.ui.userName.text()
         password = self.ui.password.text()
 
@@ -73,6 +93,7 @@ class LoginWindow(QMainWindow):
             self.ui.wrongDetails.setVisible(True)  # Show the error message
 
     def show_main_window(self):
+        """Initializes and displays the main application window, applying its specific stylesheet first."""
         from PySide6.QtWidgets import QApplication
 
         # טעינת קובץ העיצוב
@@ -84,6 +105,8 @@ class LoginWindow(QMainWindow):
 
 
 def show_login_window(app):
+    """Helper function to instantiate and show the login window, then start the Qt event loop."""
     login_window = LoginWindow(app)
     login_window.show()
     app.exec()
+
